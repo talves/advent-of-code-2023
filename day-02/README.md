@@ -1,6 +1,6 @@
 # Day 2: Cube Conundrum
 
-<!-- ![Completed](completed.png) -->
+![Completed](completed.png)
 
 ## Part 1
 
