@@ -76,7 +76,7 @@ fn process(input: &str) -> u32 {
     for i in 1..cards.len() {
         cards[i].set_copies(copy_tracker[i]);
     }
-    dbg!(&cards);
+    // dbg!(&cards);
     cards.iter().map(|card| 1 + card.copies).sum()
 }
 
