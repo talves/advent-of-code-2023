@@ -17,7 +17,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn it_works() {
+    fn part2_works() {
         let result = part2("Advent of Code!");
         assert_eq!(result, "Hello, Advent of Code!");
     }
