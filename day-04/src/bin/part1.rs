@@ -4,13 +4,13 @@ fn main() {
     dbg!(output);
 }
 
-struct Game {
+struct Card {
     winning_numbers: Vec<u32>,
 }
 
-impl Game {
-    fn new(input: &str) -> Game {
-        Game {
+impl Card {
+    fn new(input: &str) -> Card {
+        Card {
             winning_numbers: input
                 .trim()
                 .split(' ')
@@ -20,7 +20,7 @@ impl Game {
         }
     }
     fn get_points_from_str(&self, input: &str) -> u32 {
-        let mut value: Option<u32> = None;
+        let mut points: Option<u32> = None;
 
         let nums = input
             .trim()
@@ -28,16 +28,17 @@ impl Game {
             .map(|num| num.parse::<u32>().unwrap_or(0))
             .filter(|num| num > &0);
         for num in nums {
-            self.winning_numbers.iter().for_each(|winner| {
+            for winner in self.winning_numbers.iter() {
                 if num == *winner {
-                    match value {
-                        Some(val) => value = Some(val * 2),
-                        None => value = Some(1),
+                    match points {
+                        Some(val) => points = Some(val * 2),
+                        None => points = Some(1),
                     }
+                    break;
                 }
-            })
+            }
         }
-        value.unwrap_or(0)
+        points.unwrap_or(0)
     }
 }
 
@@ -46,10 +47,10 @@ fn process(input: &str) -> u32 {
         let parts = line.split(':').collect::<Vec<&str>>()[1]
             .split("|")
             .collect::<Vec<&str>>();
-        let game_winners = parts[0];
-        let game_input = parts[1];
-        let game = Game::new(game_winners);
-        game.get_points_from_str(game_input)
+        let card_winners = parts[0];
+        let card_input = parts[1];
+        let card = Card::new(card_winners);
+        card.get_points_from_str(card_input)
     });
     dbg!(&points.clone().collect::<Vec<u32>>());
     points.sum()
@@ -77,14 +78,14 @@ Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11",
     }
 
     #[test]
-    fn part1_new_game() {
-        let game = Game::new("41 48 83 86 17");
-        assert_eq!(game.winning_numbers, vec![41, 48, 83, 86, 17]);
+    fn part1_new_card() {
+        let card = Card::new("41 48 83 86 17");
+        assert_eq!(card.winning_numbers, vec![41, 48, 83, 86, 17]);
     }
 
     #[test]
-    fn part1_point() {
-        let game = Game::new("41 48 83 86 17");
-        assert_eq!(game.get_points_from_str("83 86  6 31 17  9 48 53"), 8);
+    fn part1_points() {
+        let card = Card::new("41 48 83 86 17");
+        assert_eq!(card.get_points_from_str("83 86  6 31 17  9 48 53"), 8);
     }
 }
