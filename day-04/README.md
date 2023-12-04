@@ -1,6 +1,6 @@
 # Day 4: Scratchcards
 
-<!-- ![Completed](completed.png) -->
+![Completed](completed.png)
 
 ## Part 1
 
