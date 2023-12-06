@@ -17,16 +17,20 @@ impl Race {
             record_distance,
         }
     }
-    fn ways_to_beat_record(&self) -> Vec<u32> {
-        let mut wins: Vec<u32> = Vec::new();
-        for i in 1..self.time as usize {
-            let hold_ms = i as u32;
-            let millisecons_to_move = self.time - hold_ms;
-            let distance: u32 = hold_ms * millisecons_to_move;
-            if distance > self.record_distance {
-                wins.push(hold_ms);
-            }
-        }
+    fn ways_to_beat_record(&self) -> impl Iterator<Item = u32> + '_ {
+        // let mut wins: Vec<u32> = Vec::new();
+        let wins = (1..self.time).filter_map(|hold_ms| {
+            // let distance = hold_ms * (self.time - hold_ms);
+            (hold_ms * (self.time - hold_ms) > self.record_distance).then_some(hold_ms)
+        });
+        // for i in 1..self.time as usize {
+        //     let hold_ms = i as u32;
+        //     let millisecons_to_move = self.time - hold_ms;
+        //     let distance: u32 = hold_ms * millisecons_to_move;
+        //     if distance > self.record_distance {
+        //         wins.push(hold_ms);
+        //     }
+        // }
         wins
     }
 }
@@ -72,7 +76,7 @@ fn process(input: &str) -> u32 {
     let races = parse_input(input);
     // dbg!(&races);
     for race in &races {
-        let ways = race.ways_to_beat_record().len();
+        let ways = race.ways_to_beat_record().count();
         // dbg!(ways);
         value *= ways as u32;
     }
