@@ -4,11 +4,82 @@ fn main() {
     dbg!(output);
 }
 
-fn process(input: &str) -> String {
-    format!("Hello, {}", input)
+#[derive(Debug)]
+struct Race {
+    time: u32,
+    record_distance: u32,
 }
 
-fn part1(input: &str) -> String {
+impl Race {
+    fn new(time: u32, record_distance: u32) -> Race {
+        Race {
+            time,
+            record_distance,
+        }
+    }
+    fn ways_to_beat_record(&self) -> Vec<u32> {
+        let mut wins: Vec<u32> = Vec::new();
+        for i in 1..self.time as usize {
+            let hold_ms = i as u32;
+            let millisecons_to_move = self.time - hold_ms;
+            let distance: u32 = hold_ms * millisecons_to_move;
+            if distance > self.record_distance {
+                wins.push(hold_ms);
+            }
+        }
+        wins
+    }
+}
+
+fn parse_input(input: &str) -> Vec<Race> {
+    let mut races: Vec<Race> = vec![];
+    let mut times: Vec<u32> = vec![];
+    let mut record_distances: Vec<u32> = vec![];
+    for line in input.lines() {
+        let parts: Vec<&str> = line.split(':').collect();
+        match parts[0] {
+            "Time" => {
+                times = parts[1]
+                    .trim()
+                    .split(' ')
+                    .filter(|s| !s.is_empty())
+                    .map(|num| num.trim().parse::<u32>().unwrap_or(0))
+                    .collect();
+            }
+            "Distance" => {
+                record_distances = parts[1]
+                    .trim()
+                    .split(' ')
+                    .filter(|s| !s.is_empty())
+                    .map(|num| num.trim().parse::<u32>().unwrap_or(0))
+                    .collect();
+            }
+            _ => {}
+        };
+    }
+    // dbg!(&times);
+    // dbg!(&record_distances);
+    if times.len() == record_distances.len() {
+        for i in 0..times.len() {
+            races.push(Race::new(times[i], record_distances[i]))
+        }
+    }
+    races
+}
+
+fn process(input: &str) -> u32 {
+    let mut value: u32 = 1;
+    let races = parse_input(input);
+    // dbg!(&races);
+    for race in &races {
+        let ways = race.ways_to_beat_record().len();
+        // dbg!(ways);
+        value *= ways as u32;
+    }
+    value
+}
+
+fn part1(input: &str) -> u32 {
     process(input)
 }
 
@@ -18,7 +89,10 @@ mod tests {
 
     #[test]
     fn part1_works() {
-        let result = part1("Advent of Code!");
-        assert_eq!(result, "Hello, Advent of Code!");
+        let result = part1(
+            "Time:      7  15   30
+Distance:  9  40  200",
+        );
+        assert_eq!(result, 288);
     }
 }
