@@ -7,6 +7,7 @@
 ```bash
 cargo test
 cargo run --bin part1
+cargo run --package day-05 --bin part1 -- tests --nocapture
 ```
 
 The almanac (your puzzle input) lists all of the seeds that need to be planted. It also lists what type of soil to use with each kind of seed, what type of fertilizer to use with each kind of soil, what type of water to use with each kind of fertilizer, and so on. Every type of seed, soil, fertilizer and so on is identified with a number, but numbers are reused by each category - that is, soil 123 and fertilizer 123 aren't necessarily related to each other.
