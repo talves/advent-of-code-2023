@@ -1,6 +1,6 @@
 # Day 7: Camel Cards
 
-<!-- ![Completed](completed.png) -->
+![Completed](completed.png)
 
 ## Part 1
 
