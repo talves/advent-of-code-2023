@@ -24,21 +24,10 @@ fn parse_input(input: &str) -> (Vec<Direction>, HashMap<&str, (&str, &str)>) {
         })
         .collect::<Vec<Direction>>();
     let mut mapping: HashMap<&str, (&str, &str)> = HashMap::new();
-    // let mut start: Option<&str> = None;
-    // let mut end: Option<&str> = None;
     for line in lines {
         if !line.is_empty() {
             // example: FKX = (LSH, TSV)
             let key = &line[0..3];
-            // match start {
-            //     Some(_) => {
-            //         end = Some(&key);
-            //     }
-            //     None => {
-            //         start = Some(&key);
-            //         end = Some(&key);
-            //     }
-            // }
             let left = &line[7..10];
             let right = &line[12..15];
             mapping.insert(key, (left, right));
@@ -68,7 +57,7 @@ fn process(input: &str) -> u32 {
                 break;
             }
         }
-        dbg!(&current_key);
+        // dbg!(&current_key);
     }
     count
 }
