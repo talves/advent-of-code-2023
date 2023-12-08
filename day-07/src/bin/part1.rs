@@ -17,6 +17,7 @@ enum HandType {
 
 #[derive(Debug)]
 struct Hand<'a> {
+    #[allow(dead_code)]
     cards: &'a str,
     bid: u32,
     hand_type: HandType,
