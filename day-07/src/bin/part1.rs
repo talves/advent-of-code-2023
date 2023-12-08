@@ -56,32 +56,32 @@ fn get_hand_type(cards: &str) -> HandType {
     let mut hand_type = HandType::High;
     while remaining.len() > 0 {
         let c: char = remaining.chars().next().unwrap();
+        last_type = match hand_type {
+            HandType::Five => HandType::Five,
+            HandType::Four => HandType::Four,
+            HandType::Full => HandType::Full,
+            HandType::Three => HandType::Three,
+            HandType::Twopair => HandType::Twopair,
+            HandType::Onepair => HandType::Onepair,
+            HandType::High => HandType::High,
+        };
         hand_type = get_hand_type_from_char(c, &remaining);
         remaining = remaining.replace(c, "");
         match hand_type {
-            HandType::Five => remaining = "".to_string(),
-            HandType::Four => remaining = "".to_string(),
-            HandType::Full => remaining = "".to_string(),
+            HandType::Five => {}
+            HandType::Four => {}
+            HandType::Full => {}
             HandType::Three => {
                 if last_type == HandType::Onepair {
                     hand_type = HandType::Full;
-                    remaining = "".to_string();
-                } else {
-                    last_type = HandType::Three
                 }
             }
-            HandType::Twopair => {
-                remaining = "".to_string();
-            }
+            HandType::Twopair => {}
             HandType::Onepair => {
                 if last_type == HandType::Onepair {
                     hand_type = HandType::Twopair;
-                    remaining = "".to_string();
                 } else if last_type == HandType::Three {
                     hand_type = HandType::Full;
-                    remaining = "".to_string();
-                } else {
-                    last_type = HandType::Onepair;
                 }
             }
             HandType::High => {
