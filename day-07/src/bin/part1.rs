@@ -4,7 +4,7 @@ fn main() {
     dbg!(output);
 }
 
-#[derive(PartialEq, Debug)]
+#[derive(Debug, Clone, Copy, Eq, PartialEq, Ord, PartialOrd)]
 enum HandType {
     Five,
     Four,
@@ -52,7 +52,7 @@ fn get_hand_type(cards: &str) -> HandType {
         panic!("Must have 5 cards in a hand");
     };
     let mut remaining = cards.to_string();
-    let mut last_type = HandType::High;
+    let mut last_type;
     let mut hand_type = HandType::High;
     while remaining.len() > 0 {
         let c: char = remaining.chars().next().unwrap();
@@ -160,7 +160,7 @@ fn parse_input(input: &str) -> impl Iterator<Item = Hand> + '_ {
     })
 }
 
-fn build_hands<'a>(hands: impl Iterator<Item = Hand<'a>>) -> impl Iterator<Item = Hand<'a>> {
+fn sort_hands<'a>(hands: impl Iterator<Item = Hand<'a>>) -> impl Iterator<Item = Hand<'a>> {
     let mut five: Vec<Hand> = vec![];
     let mut four: Vec<Hand> = vec![];
     let mut full: Vec<Hand> = vec![];
@@ -207,7 +207,7 @@ fn build_hands<'a>(hands: impl Iterator<Item = Hand<'a>>) -> impl Iterator<Item 
 
 fn process(input: &str) -> u32 {
     let orig_hands = parse_input(input);
-    let hands = build_hands(orig_hands);
+    let hands = sort_hands(orig_hands);
     let total_winnings: u32 = hands
         .enumerate()
         .map(|(i, hand)| hand.bid * (i as u32 + 1))
