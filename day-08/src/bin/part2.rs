@@ -45,25 +45,29 @@ fn process(input: &str) -> u32 {
     // dbg!(&start_keys);
     // dbg!(&paths);
     let mut found_z_end = false;
-    let mut current_keys: Vec<&str> = start_keys.iter().map(|x| *x).collect::<Vec<&str>>();
+    let mut current_keys: Vec<&str> = vec![""; start_keys.len()];
+    start_keys
+        .iter()
+        .enumerate()
+        .for_each(|(i, x)| current_keys[i] = *x);
     let mut count = 0;
     while !found_z_end {
         for direction in &directions {
-            let mut new_keys: Vec<&str> = Vec::new();
+            let mut new_keys: Vec<&str> = vec![""; start_keys.len()];
             current_keys
                 .iter()
-                .for_each(|current_key| match paths.get(*current_key) {
+                .enumerate()
+                .for_each(|(i, current_key)| match paths.get(*current_key) {
                     Some((left, right)) => match direction {
-                        Direction::Left => new_keys.push(left),
-                        Direction::Right => new_keys.push(right),
+                        Direction::Left => new_keys[i] = *left,
+                        Direction::Right => new_keys[i] = *right,
                     },
                     None => panic!("Paths found unmapped key {}", current_key),
                 });
             count += 1;
             found_z_end = true;
-            current_keys = Vec::new();
-            for current_key in new_keys {
-                current_keys.push(current_key);
+            for (i, current_key) in new_keys.iter().enumerate() {
+                current_keys[i] = *current_key;
                 if &current_key[2..3] != "Z" {
                     found_z_end = false;
                 }
