@@ -98,9 +98,11 @@ fn process(input: &str) -> u64 {
     // dbg!(&end_keys);
     // dbg!(&key_map);
     let mut current_keys: Vec<usize> = start_keys.clone();
+    let mut previous_keys: Vec<usize>;
     let mut finished: bool = false;
     let mut count: u64 = 0;
     while !finished {
+        previous_keys = current_keys.clone();
         for direction in &directions {
             let mut new_keys: Vec<usize> = Vec::new();
             current_keys.iter().for_each(|key| match *direction {
@@ -112,18 +114,24 @@ fn process(input: &str) -> u64 {
                 .iter()
                 .filter(|item| end_keys.contains(item))
                 .count()
-                == end_keys.len();
+                == new_keys.len();
             count += 1;
             // dbg!(&current_keys);
             if finished {
                 break;
             }
         }
+        current_keys = current_keys
+            .iter()
+            .enumerate()
+            .filter(|(i, key)| previous_keys[*i] != **key)
+            .map(|(_, key)| *key)
+            .collect();
         if count % 10000 == 0 {
             dbg!(&count);
         }
     }
-    dbg!(count);
+    dbg!(&count);
     count
 }
 

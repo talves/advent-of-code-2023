@@ -52,3 +52,4 @@ cargo test
 cargo run --bin part2
 ```
 
+TODO: refactor to be able to solve without so many iterations
