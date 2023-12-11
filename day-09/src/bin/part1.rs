@@ -1,5 +1,3 @@
-use std::borrow::BorrowMut;
-
 fn main() {
     let input = include_str!("../input.txt");
     let output = part1(input);
@@ -29,7 +27,7 @@ impl History {
                 diffs.push(data[i + 1] - data[i]);
             }
             if diffs[last_len - 1] == 0 {
-                return 0;
+                0
             } else {
                 diffs[last_len - 1] + get_prediction(&diffs)
             }
