@@ -188,16 +188,13 @@ impl Location {
                 if loc != last_location {
                     match map.get(loc) {
                         Some(pipe) => match pipe {
-                            Pipe::Vertical | Pipe::BendSE | Pipe::BendSW => {
+                            Pipe::Starting | Pipe::Vertical | Pipe::BendSE | Pipe::BendSW => {
                                 if [Pipe::Vertical, Pipe::BendNE, Pipe::BendNW].contains(this_pipe)
                                 {
                                     new_location = *loc;
                                 }
                             }
                             Pipe::Ground | Pipe::BendNE | Pipe::BendNW | Pipe::Horizontal => {}
-                            Pipe::Starting => {
-                                panic!("More than one starting point")
-                            }
                         },
                         None => {}
                     }
@@ -207,16 +204,13 @@ impl Location {
                 if loc != last_location {
                     match map.get(loc) {
                         Some(pipe) => match pipe {
-                            Pipe::Vertical | Pipe::BendNE | Pipe::BendNW => {
+                            Pipe::Starting | Pipe::Vertical | Pipe::BendNE | Pipe::BendNW => {
                                 if [Pipe::Vertical, Pipe::BendSE, Pipe::BendSW].contains(this_pipe)
                                 {
                                     new_location = *loc;
                                 }
                             }
                             Pipe::Ground | Pipe::BendSE | Pipe::BendSW | Pipe::Horizontal => {}
-                            Pipe::Starting => {
-                                panic!("More than one starting point")
-                            }
                         },
                         None => {}
                     }
@@ -226,7 +220,7 @@ impl Location {
                 if loc != last_location {
                     match map.get(loc) {
                         Some(pipe) => match pipe {
-                            Pipe::Horizontal | Pipe::BendNE | Pipe::BendSE => {
+                            Pipe::Starting | Pipe::Horizontal | Pipe::BendNE | Pipe::BendSE => {
                                 if [Pipe::Horizontal, Pipe::BendNW, Pipe::BendSW]
                                     .contains(this_pipe)
                                 {
@@ -234,9 +228,6 @@ impl Location {
                                 }
                             }
                             Pipe::Ground | Pipe::BendSW | Pipe::BendNW | Pipe::Vertical => {}
-                            Pipe::Starting => {
-                                panic!("More than one starting point")
-                            }
                         },
                         None => {}
                     }
@@ -246,7 +237,7 @@ impl Location {
                 if loc != last_location {
                     match map.get(loc) {
                         Some(pipe) => match pipe {
-                            Pipe::Horizontal | Pipe::BendNW | Pipe::BendSW => {
+                            Pipe::Starting | Pipe::Horizontal | Pipe::BendNW | Pipe::BendSW => {
                                 if [Pipe::Horizontal, Pipe::BendNE, Pipe::BendSE]
                                     .contains(this_pipe)
                                 {
@@ -254,9 +245,6 @@ impl Location {
                                 }
                             }
                             Pipe::Ground | Pipe::BendSE | Pipe::BendNE | Pipe::Vertical => {}
-                            Pipe::Starting => {
-                                panic!("More than one starting point")
-                            }
                         },
                         None => {}
                     }
@@ -325,16 +313,14 @@ fn process(input: &str) -> u32 {
         let next_two = path_two.get_path(&last_location_two, &loop_map);
         last_location_one = path_one.point;
         last_location_two = path_two.point;
-        dbg!(format!("{:?}", next_one));
-        dbg!(format!("{:?}", next_two));
         path_one = set_point(&next_one, &bound_location);
         path_two = set_point(&next_two, &bound_location);
-        still_searching = path_one.point != path_two.point
-            && path_one.point != last_location_two
-            && path_two.point != last_location_one;
+        still_searching = path_one.point != path_two.point;
         count += 1;
     }
 
+    dbg!(format!("{:?}", path_one.point));
+    dbg!(format!("{:?}", path_two.point));
     // dbg!(&count);
     // dbg!(&paths);
     // dbg!(&bound_location);
