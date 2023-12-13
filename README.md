@@ -1,3 +1,3 @@
 # Advent of Code 2023 (Rust)
 
-![Completed](day-09/completed.png)
+![Completed](day-10/completed.png)

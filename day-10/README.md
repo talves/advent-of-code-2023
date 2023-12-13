@@ -1,6 +1,6 @@
 # Day 10: Pipe Maze
 
-<!-- ![Completed](completed.png) -->
+![Completed](completed.png)
 
 ## Part 1
 

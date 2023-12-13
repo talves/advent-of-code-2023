@@ -472,6 +472,99 @@ impl Tracker<'_> {
             }
         }
     }
+    // Set Option start or None to cover all right values
+    fn fill_right(&mut self, bounds: &PipeLocation, start: Option<PipeLocation>) {
+        if let Some(item) = start {
+            let mut location = Location::new();
+            location.set(&item, bounds);
+            if let Some(east) = &location.east {
+                if let Some(_item) = self.tunnel.get(east) {
+                } else {
+                    if let Some(_right) = self.right.get(east) {
+                    } else {
+                        self.right.insert(*east, None);
+                        self.fill_right(bounds, Some(*east));
+                    }
+                }
+            };
+            if let Some(west) = &location.west {
+                if let Some(_item) = self.tunnel.get(west) {
+                } else {
+                    if let Some(_right) = self.right.get(west) {
+                    } else {
+                        self.right.insert(*west, None);
+                        self.fill_right(bounds, Some(*west));
+                    }
+                }
+            };
+            if let Some(north) = &location.north {
+                if let Some(_item) = self.tunnel.get(north) {
+                } else {
+                    if let Some(_right) = self.right.get(north) {
+                    } else {
+                        self.right.insert(*north, None);
+                        self.fill_right(bounds, Some(*north));
+                    }
+                }
+            };
+            if let Some(south) = &location.south {
+                if let Some(_item) = self.tunnel.get(south) {
+                } else {
+                    if let Some(_right) = self.right.get(south) {
+                    } else {
+                        self.right.insert(*south, None);
+                        self.fill_right(bounds, Some(*south));
+                    }
+                }
+            };
+        }
+    }
+    fn fill_left(&mut self, bounds: &PipeLocation, start: Option<PipeLocation>) {
+        if let Some(item) = start {
+            let mut location = Location::new();
+            location.set(&item, bounds);
+            if let Some(east) = &location.east {
+                if let Some(_item) = self.tunnel.get(east) {
+                } else {
+                    if let Some(_left) = self.left.get(east) {
+                    } else {
+                        self.left.insert(*east, None);
+                        self.fill_left(bounds, Some(*east));
+                    }
+                }
+            };
+            if let Some(west) = &location.west {
+                if let Some(_item) = self.tunnel.get(west) {
+                } else {
+                    if let Some(_left) = self.left.get(west) {
+                    } else {
+                        self.left.insert(*west, None);
+                        self.fill_left(bounds, Some(*west));
+                    }
+                }
+            };
+            if let Some(north) = &location.north {
+                if let Some(_item) = self.tunnel.get(north) {
+                } else {
+                    if let Some(_left) = self.left.get(north) {
+                    } else {
+                        self.left.insert(*north, None);
+                        self.fill_left(bounds, Some(*north));
+                    }
+                }
+            };
+            if let Some(south) = &location.south {
+                if let Some(_item) = self.tunnel.get(south) {
+                } else {
+                    if let Some(_left) = self.left.get(south) {
+                    } else {
+                        self.left.insert(*south, None);
+                        self.fill_left(bounds, Some(*south));
+                    }
+                }
+            };
+        }
+    }
 }
 
 fn parse_input(input: &str) -> (PipeLocation, PipeLocation, HashMap<PipeLocation, Pipe>) {
@@ -568,7 +661,23 @@ fn process_part2(input: &str) -> u32 {
     dbg!(format!("{:?}", path_one.point));
     dbg!(&count);
     // TODO: Need to determine what the last location was and match to last to find out if right or left are inside loop
-    // TODO: Fill in the missing surrounded ground. Should just add whole grid with ground, then make sure there are none next to right and left :)
+    // Fill in the missing surrounded ground. Should just add whole grid with ground, then make sure there are none next to right and left :)
+    let rights = tracker
+        .right
+        .iter()
+        .map(|right| *right.0)
+        .collect::<Vec<PipeLocation>>();
+    for right in rights {
+        tracker.fill_right(&bound_location, Some(right));
+    }
+    let lefts = tracker
+        .left
+        .iter()
+        .map(|left| *left.0)
+        .collect::<Vec<PipeLocation>>();
+    for left in lefts {
+        tracker.fill_left(&bound_location, Some(left));
+    }
     dbg!(&tracker.right.len());
     dbg!(&tracker.left.len());
     // dbg!(&tracker.left);
@@ -628,7 +737,7 @@ mod tests {
 .L------J.
 ..........",
         );
-        assert_eq!(result, 99);
+        assert_eq!(result, 30);
 
         let result = part2(
             ".F----7F7F7F7F-7....
