@@ -567,7 +567,8 @@ fn process_part2(input: &str) -> u32 {
 
     dbg!(format!("{:?}", path_one.point));
     dbg!(&count);
-    // Need to determine what the last location was and match to last to find out if right or left are inside loop
+    // TODO: Need to determine what the last location was and match to last to find out if right or left are inside loop
+    // TODO: Fill in the missing surrounded ground. Should just add whole grid with ground, then make sure there are none next to right and left :)
     dbg!(&tracker.right.len());
     dbg!(&tracker.left.len());
     // dbg!(&tracker.left);
@@ -615,6 +616,20 @@ mod tests {
 ..........",
         );
         assert_eq!(result, 4);
+        assert_eq!(result, 4);
+        let result = part2(
+            "..........
+.S------7.
+.|F----7|.
+.||....||.
+.||....||.
+.|L-7F-J|.
+.|..||..|.
+.L------J.
+..........",
+        );
+        assert_eq!(result, 99);
+
         let result = part2(
             ".F----7F7F7F7F-7....
 .|F--7||||||||FJ....
