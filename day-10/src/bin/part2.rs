@@ -662,22 +662,24 @@ fn process_part2(input: &str) -> u32 {
     dbg!(&count);
     // TODO: Need to determine what the last location was and match to last to find out if right or left are inside loop
     // Fill in the missing surrounded ground. Should just add whole grid with ground, then make sure there are none next to right and left :)
-    let rights = tracker
+    tracker
         .right
         .iter()
         .map(|right| *right.0)
-        .collect::<Vec<PipeLocation>>();
-    for right in rights {
-        tracker.fill_right(&bound_location, Some(right));
-    }
-    let lefts = tracker
+        .collect::<Vec<PipeLocation>>()
+        .iter()
+        .for_each(|right| {
+            tracker.fill_right(&bound_location, Some(*right));
+        });
+    tracker
         .left
         .iter()
         .map(|left| *left.0)
-        .collect::<Vec<PipeLocation>>();
-    for left in lefts {
-        tracker.fill_left(&bound_location, Some(left));
-    }
+        .collect::<Vec<PipeLocation>>()
+        .iter()
+        .for_each(|left| {
+            tracker.fill_left(&bound_location, Some(*left));
+        });
     dbg!(&tracker.right.len());
     dbg!(&tracker.left.len());
     // dbg!(&tracker.left);
