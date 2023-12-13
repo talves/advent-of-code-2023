@@ -9,8 +9,7 @@ cargo test
 cargo run --bin part1
 ```
 
-[instructions](https://adventofcode.com/2023/day/00)
-
+[instructions](https://adventofcode.com/2023/day/11)
 
 ## Part 2
 
