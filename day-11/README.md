@@ -1,6 +1,6 @@
 # Day 0:
 
-<!-- ![Completed](completed.png) -->
+![Completed](completed.png)
 
 ## Part 1
 
@@ -18,3 +18,4 @@ cargo test
 cargo run --bin part2
 ```
 
+[instructions](https://adventofcode.com/2023/day/11#part2)
