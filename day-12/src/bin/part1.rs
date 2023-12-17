@@ -169,7 +169,15 @@ impl ReportLine {
 
         let permutations = unique_permutations(self.unknown.clone());
         dbg!(format!("{:?}", &permutations.len()));
-        let mut lines: Vec<String> = permutations
+
+        let sequence_needed: Vec<(Spring, usize)> = self
+            .arrangement
+            .iter()
+            .map(|count| (Spring::Damaged, *count))
+            .collect::<Vec<(Spring, usize)>>();
+        // dbg!(format!("{:?}", &sequence_needed));
+        let mut dedups_list: Vec<String> = Vec::new();
+        let count: u64 = permutations
             .iter()
             .map(|combo| {
                 let mut workstr = self.original.to_string();
@@ -178,35 +186,28 @@ impl ReportLine {
                     // we should not need this next line, but keeping it for debug
                     // workstr = workstr.replace("?", ".");
                 });
-                workstr
-            })
-            .collect();
-        lines.sort();
-        lines.dedup();
-        // dbg!(&lines);
-
-        let sequence_needed: Vec<(Spring, usize)> = self
-            .arrangement
-            .iter()
-            .map(|count| (Spring::Damaged, *count))
-            .collect::<Vec<(Spring, usize)>>();
-        // dbg!(format!("{:?}", &sequence_needed));
-        lines
-            .iter()
-            .map(|line| {
-                let sequence = Self::get_sequence_from(line)
-                    .iter()
-                    .filter(|(spring, _count)| *spring == Spring::Damaged)
-                    .map(|tuple| *tuple)
-                    .collect::<Vec<(Spring, usize)>>();
-                // dbg!(format!("{:?}", &sequence));
-                if sequence == sequence_needed {
-                    1
+                if dedups_list.contains(&workstr) {
+                    0u64
                 } else {
-                    0
+                    let sequence = Self::get_sequence_from(&workstr)
+                        .iter()
+                        .filter(|(spring, _count)| *spring == Spring::Damaged)
+                        .map(|tuple| *tuple)
+                        .collect::<Vec<(Spring, usize)>>();
+                    // dbg!(format!("{:?}", &sequence));
+                    if sequence == sequence_needed {
+                        dedups_list.push(workstr);
+                        1u64
+                    } else {
+                        0u64
+                    }
                 }
             })
-            .sum()
+            .sum();
+
+        dbg!(format!("{:?}", &dedups_list.len()));
+        // dbg!(&count);
+        count
     }
 }
 
