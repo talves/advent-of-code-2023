@@ -113,14 +113,15 @@ where
 }
 
 impl ReportLine {
-    fn get_count(&self) -> u64 {
+    fn get_unique_permutations(&self) -> Vec<String> {
         let damaged_count = self.damaged.len();
         let unknown_count = self.unknown.len();
         let damaged_needed: usize = self.arrangement.iter().map(|x| x).sum::<usize>();
         let damaged_missing: usize = damaged_needed - damaged_count;
         let skips_needed: usize = unknown_count - damaged_missing;
 
-        // dbg!(&self.original);
+        dbg!(&self.original);
+        dbg!(format!("{:?}", &self.arrangement));
         // dbg!(&damaged_count);
         // dbg!(&unknown_count);
         // dbg!(&damaged_needed);
@@ -142,18 +143,16 @@ impl ReportLine {
         let mut dedups_list: Vec<String> = Vec::new();
 
         // Get unique permutations of the chars needed above
-        let count: u64 = unique_permutations(char_combination)
+        unique_permutations(char_combination)
             .iter()
-            .map(|permutation| {
+            .for_each(|permutation| {
                 let mut workstr = self.original.to_string();
                 permutation.iter().enumerate().for_each(|(idx, ch)| {
                     workstr.replace_range(self.unknown[idx]..=self.unknown[idx], &*ch.to_string());
                     // we should not need this next line, but keeping it for debug
                     // workstr = workstr.replace("?", ".");
                 });
-                if dedups_list.contains(&workstr) {
-                    0u64
-                } else {
+                if !dedups_list.contains(&workstr) {
                     let sequence = Self::get_sequence_from(&workstr)
                         .iter()
                         .filter(|(spring, _count)| *spring == Spring::Damaged)
@@ -162,15 +161,17 @@ impl ReportLine {
                     // dbg!(format!("{:?}", &sequence));
                     if sequence == sequence_needed {
                         dedups_list.push(workstr);
-                        1u64
-                    } else {
-                        0u64
                     }
                 }
-            })
-            .sum();
-        // dbg!(&count);
-        count
+            });
+        // dbg!(&dedups_list);
+        dedups_list
+    }
+    fn get_count(&self) -> u64 {
+        Self::get_unique_permutations(&self)
+            .len()
+            .try_into()
+            .unwrap()
     }
 
     fn get_sequence_from(line: &String) -> Vec<(Spring, usize)> {
