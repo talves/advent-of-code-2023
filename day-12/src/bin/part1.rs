@@ -8,11 +8,7 @@ fn main() {
 
 fn process(input: &str) -> u64 {
     let report = Report::from_str(input).unwrap();
-    report
-        .lines
-        .iter()
-        .map(|line| line.get_arrangement_count())
-        .sum()
+    report.lines.iter().map(|line| line.get_count()).sum()
 }
 
 fn part1(input: &str) -> u64 {
@@ -98,7 +94,7 @@ where
         for first in unique_items {
             let mut remaining_elements = items.clone();
 
-            // this feature is unstable
+            // this feature is unstable at this time
             // remaining_elements.remove_item(first);
 
             let index = remaining_elements.iter().position(|x| *x == first).unwrap();
@@ -114,6 +110,66 @@ where
 }
 
 impl ReportLine {
+    fn get_count(&self) -> u64 {
+        let damaged_count = self.damaged.len();
+        let unknown_count = self.unknown.len();
+        let damaged_needed: usize = self.arrangement.iter().map(|x| x).sum::<usize>();
+        let damaged_missing: usize = damaged_needed - damaged_count;
+        let skips_needed: usize = unknown_count - damaged_missing;
+
+        // dbg!(&self.original);
+        // dbg!(&damaged_count);
+        // dbg!(&unknown_count);
+        // dbg!(&damaged_needed);
+        // dbg!(&damaged_missing);
+        // dbg!(&skips_needed);
+
+        // Create a mapping of our needed damaged fill using index of &str example: "##."
+        let mut char_combination: Vec<char> = Vec::new();
+        (0..damaged_missing).for_each(|_| char_combination.push('#'));
+        (0..skips_needed).for_each(|_| char_combination.push('.'));
+
+        // The sequence we are looking for from original
+        let sequence_needed: Vec<(Spring, usize)> = self
+            .arrangement
+            .iter()
+            .map(|count| (Spring::Damaged, *count))
+            .collect::<Vec<(Spring, usize)>>();
+        // dbg!(format!("{:?}", &sequence_needed));
+        let mut dedups_list: Vec<String> = Vec::new();
+
+        // Get unique permutations of the chars needed above
+        let count: u64 = unique_permutations(char_combination)
+            .iter()
+            .map(|permutation| {
+                let mut workstr = self.original.to_string();
+                permutation.iter().enumerate().for_each(|(idx, ch)| {
+                    workstr.replace_range(self.unknown[idx]..=self.unknown[idx], &*ch.to_string());
+                    // we should not need this next line, but keeping it for debug
+                    // workstr = workstr.replace("?", ".");
+                });
+                if dedups_list.contains(&workstr) {
+                    0u64
+                } else {
+                    let sequence = Self::get_sequence_from(&workstr)
+                        .iter()
+                        .filter(|(spring, _count)| *spring == Spring::Damaged)
+                        .map(|tuple| *tuple)
+                        .collect::<Vec<(Spring, usize)>>();
+                    // dbg!(format!("{:?}", &sequence));
+                    if sequence == sequence_needed {
+                        dedups_list.push(workstr);
+                        1u64
+                    } else {
+                        0u64
+                    }
+                }
+            })
+            .sum();
+        // dbg!(&count);
+        count
+    }
+
     fn get_sequence_from(line: &String) -> Vec<(Spring, usize)> {
         let mut seq_count: usize = 0;
         // We'll use S as a start previous char placebo
@@ -147,67 +203,6 @@ impl ReportLine {
         });
         sequence.push((last_spring_type, seq_count));
         sequence
-    }
-    fn get_arrangement_count(&self) -> u64 {
-        let damaged_count = self.damaged.len();
-        let unknown_count = self.unknown.len();
-        let damaged_needed: usize = self.arrangement.iter().map(|x| x).sum::<usize>();
-        let damaged_missing: usize = damaged_needed - damaged_count;
-        let skips_needed: usize = unknown_count - damaged_missing;
-
-        // dbg!(&self.original);
-        // dbg!(&damaged_count);
-        // dbg!(&unknown_count);
-        // dbg!(&damaged_needed);
-        // dbg!(&damaged_missing);
-        // dbg!(&skips_needed);
-
-        // Create a mapping of our needed damaged fill using index of &str example: "##."
-        let mut char_combination: Vec<&str> = Vec::new();
-        (0..damaged_missing).for_each(|_| char_combination.push("#"));
-        (0..skips_needed).for_each(|_| char_combination.push("."));
-
-        let permutations = unique_permutations(self.unknown.clone());
-        dbg!(format!("{:?}", &permutations.len()));
-
-        let sequence_needed: Vec<(Spring, usize)> = self
-            .arrangement
-            .iter()
-            .map(|count| (Spring::Damaged, *count))
-            .collect::<Vec<(Spring, usize)>>();
-        // dbg!(format!("{:?}", &sequence_needed));
-        let mut dedups_list: Vec<String> = Vec::new();
-        let count: u64 = permutations
-            .iter()
-            .map(|combo| {
-                let mut workstr = self.original.to_string();
-                combo.iter().enumerate().for_each(|(idx, pos)| {
-                    workstr.replace_range(pos..=pos, char_combination[idx]);
-                    // we should not need this next line, but keeping it for debug
-                    // workstr = workstr.replace("?", ".");
-                });
-                if dedups_list.contains(&workstr) {
-                    0u64
-                } else {
-                    let sequence = Self::get_sequence_from(&workstr)
-                        .iter()
-                        .filter(|(spring, _count)| *spring == Spring::Damaged)
-                        .map(|tuple| *tuple)
-                        .collect::<Vec<(Spring, usize)>>();
-                    // dbg!(format!("{:?}", &sequence));
-                    if sequence == sequence_needed {
-                        dedups_list.push(workstr);
-                        1u64
-                    } else {
-                        0u64
-                    }
-                }
-            })
-            .sum();
-
-        dbg!(format!("{:?}", &dedups_list.len()));
-        // dbg!(&count);
-        count
     }
 }
 
@@ -336,11 +331,11 @@ mod tests {
 ?###???????? 3,2,1";
         let result = Report::from_str(input).unwrap();
         assert_eq!(result.lines.len(), 6);
-        assert_eq!(result.lines[0].get_arrangement_count(), 1);
-        assert_eq!(result.lines[1].get_arrangement_count(), 4);
-        assert_eq!(result.lines[2].get_arrangement_count(), 1);
-        assert_eq!(result.lines[3].get_arrangement_count(), 1);
-        assert_eq!(result.lines[4].get_arrangement_count(), 4);
-        assert_eq!(result.lines[5].get_arrangement_count(), 10);
+        assert_eq!(result.lines[0].get_count(), 1);
+        assert_eq!(result.lines[1].get_count(), 4);
+        assert_eq!(result.lines[2].get_count(), 1);
+        assert_eq!(result.lines[3].get_count(), 1);
+        assert_eq!(result.lines[4].get_count(), 4);
+        assert_eq!(result.lines[5].get_count(), 10);
     }
 }
