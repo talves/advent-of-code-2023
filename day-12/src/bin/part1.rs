@@ -8,7 +8,7 @@ fn main() {
 
 fn process(input: &str) -> u64 {
     let report = Report::from_str(input).unwrap();
-    report.lines.iter().map(|line| line.get_count()).sum()
+    report.sum()
 }
 
 fn part1(input: &str) -> u64 {
@@ -61,6 +61,9 @@ struct Report {
 impl Report {
     fn new() -> Report {
         Report { lines: Vec::new() }
+    }
+    fn sum(&self) -> u64 {
+        self.lines.iter().map(|line| line.get_count()).sum()
     }
 }
 
