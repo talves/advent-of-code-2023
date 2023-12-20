@@ -8,9 +8,9 @@ fn main() {
 
 fn process(input: &str) -> u64 {
     let report = Report::from_str(input).unwrap();
-    // report.iterate_sum(5)
+    report.iterate_sum(5)
     // report.sum()
-    report.sum_build(5)
+    // report.sum_build(5)
 }
 
 fn part2(input: &str) -> u64 {
@@ -209,20 +209,29 @@ impl ReportLine {
                         });
 
                         // let mut input = [original, "?", &str_permutation].concat();
-                        let mut input = [&str_permutation, "?", original].concat();
+                        let mut input: &str = &[&str_permutation, ""].concat();
+                        let middle: &str;
+                        let mut ending: &str = "";
+                        if original.split(".").count() != 1 {
+                            middle = "?";
+                        } else {
+                            middle = "";
+                            if count > 1 {
+                                ending = "?";
+                            } else {
+                                ending = "";
+                            };
+                        }
+                        let binding = [input, middle, original, ending].concat();
+                        input = &binding;
                         let mut arrangement_str = line.arrangement[0].to_string();
                         (1..line.arrangement.len()).for_each(|x| {
                             arrangement_str =
                                 [&arrangement_str, ",", &line.arrangement[x].to_string()].concat();
                         });
-                        input = [
-                            input,
-                            " ".to_owned(),
-                            arrangement_str,
-                            ",".to_owned(),
-                            original_arrangement.to_string(),
-                        ]
-                        .concat();
+                        let binding =
+                            [input, " ", &arrangement_str, ",", &original_arrangement].concat();
+                        input = &binding;
                         // dbg!(&input);
                         let report = Report::from_str(&input).unwrap();
                         report
@@ -260,9 +269,21 @@ impl ReportLine {
         // ]
         // .concat();
         // dbg!(&input);
-        let line = &Report::from_str(&[&self.original, " ", &arrangement_str.clone()].concat())
-            .unwrap()
-            .lines[0];
+
+        let ending: &str;
+        if self.original.split(".").count() > 1 {
+            ending = "";
+        } else {
+            if count > 1 {
+                ending = "?";
+            } else {
+                ending = "";
+            };
+        }
+        let line =
+            &Report::from_str(&[&self.original, ending, " ", &arrangement_str.clone()].concat())
+                .unwrap()
+                .lines[0];
         get_sum(&line, count, &self.original, &arrangement_str)
             .iter()
             .sum()
@@ -527,14 +548,17 @@ mod tests {
 ?#?#?#?#?#?#?#? 1,3,1,6
 ????.#...#... 4,1,1
 ????.######..#####. 1,6,5
-?###???????? 3,2,1";
+?###???????? 3,2,1
+?###??????????###???????? 3,2,1,3,2,1";
         let result = Report::from_str(input).unwrap();
-        assert_eq!(result.lines.len(), 6);
+        assert_eq!(result.lines.len(), 7);
         assert_eq!(result.lines[0].iterate_sum(5), 1);
         assert_eq!(result.lines[1].iterate_sum(5), 16384);
         assert_eq!(result.lines[2].iterate_sum(5), 1);
         assert_eq!(result.lines[3].iterate_sum(5), 16);
         assert_eq!(result.lines[4].iterate_sum(5), 2500);
+        assert_eq!(result.lines[6].get_count(), 150);
+        assert_eq!(result.lines[5].iterate_sum(2), 150);
         assert_eq!(result.lines[5].iterate_sum(5), 506250);
     }
 }
