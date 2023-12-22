@@ -19,3 +19,9 @@ cargo test
 cargo run --bin part2
 ```
 
+DO NOT USE!!!
+Note: Although this version is running and very efficent, it's very messy and just a proof of concept.
+
+There is a mixture of solutions working although one of them has an issue at the moment and producing the incorrect answer.
+
+

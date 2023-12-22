@@ -8,9 +8,25 @@ fn main() {
 
 fn process(input: &str) -> u64 {
     let report = Report::from_str(input).unwrap();
-    report.iterate_sum(5)
+    // report.iterate_sum(5)
     // report.sum()
     // report.sum_build(5)
+
+    let mut line_count = 0;
+    report
+        .lines
+        .iter()
+        .map(|line| {
+            line_count += 1;
+            println!("Line {:?}: {:?}", line_count, &line.original);
+            let start = Instant::now();
+            let sum_count = line.sum_pattern();
+            let duration = start.elapsed();
+            // dbg!(&sum_count);
+            println!("Count: {:?} Time elapsed: {:?}", sum_count, duration);
+            sum_count
+        })
+        .sum()
 }
 
 fn part2(input: &str) -> u64 {
@@ -77,6 +93,22 @@ impl Report {
                 // dbg!(&sum_count);
                 println!("Count: {:?} Time elapsed: {:?}", sum_count, duration);
                 sum_count
+            })
+            .sum()
+    }
+    fn sum_pattern(&self) -> u64 {
+        let mut line_count = 0;
+        self.lines
+            .iter()
+            .map(|line| {
+                line_count += 1;
+                println!("Line {:?}: {:?}", line_count, &line.original);
+                let start = Instant::now();
+                let sum_count = &line.sum_pattern();
+                let duration = start.elapsed();
+                // dbg!(&sum_count);
+                println!("Count: {:?} Time elapsed: {:?}", sum_count, duration);
+                *sum_count
             })
             .sum()
     }
@@ -176,6 +208,12 @@ where
 }
 
 impl ReportLine {
+    fn rem_first_and_last(value: &str) -> &str {
+        let mut chars = value.chars();
+        chars.next();
+        chars.next_back();
+        chars.as_str()
+    }
     fn iterate_sum(&self, count: usize) -> u64 {
         fn get_sum(
             line: &ReportLine,
@@ -212,15 +250,16 @@ impl ReportLine {
                         let mut input: &str = &[&str_permutation, ""].concat();
                         let middle: &str;
                         let mut ending: &str = "";
-                        if original.split(".").count() != 1 {
-                            middle = "?";
-                        } else {
+                        // if original.split(".").count() != 1 {
+                        if original.ends_with("?") {
                             middle = "";
                             if count > 1 {
                                 ending = "?";
                             } else {
                                 ending = "";
                             };
+                        } else {
+                            middle = "?";
                         }
                         let binding = [input, middle, original, ending].concat();
                         input = &binding;
@@ -251,34 +290,16 @@ impl ReportLine {
         (1..self.arrangement.len()).for_each(|x| {
             arrangement_str = [&arrangement_str, ",", &self.arrangement[x].to_string()].concat();
         });
-        // let line: ReportLine = ReportLine {
-        //     original: self.original.clone(),
-        //     sequence: self.sequence.clone(),
-        //     arrangement: self.arrangement.clone(),
-        //     unknown: self.unknown.clone(),
-        //     damaged: self.damaged.clone(),
-        // };
-        // let input = &[
-        //     self.original.clone(),
-        //     "?".to_owned(),
-        //     self.original.clone(),
-        //     " ".to_owned(),
-        //     arrangement_str.clone(),
-        //     ",".to_owned(),
-        //     arrangement_str.clone(),
-        // ]
-        // .concat();
-        // dbg!(&input);
 
         let ending: &str;
-        if self.original.split(".").count() > 1 {
-            ending = "";
-        } else {
+        if self.original.ends_with("?") {
             if count > 1 {
                 ending = "?";
             } else {
                 ending = "";
             };
+        } else {
+            ending = "";
         }
         let line =
             &Report::from_str(&[&self.original, ending, " ", &arrangement_str.clone()].concat())
@@ -287,6 +308,161 @@ impl ReportLine {
         get_sum(&line, count, &self.original, &arrangement_str)
             .iter()
             .sum()
+    }
+    fn sum_pattern(&self) -> u64 {
+        dbg!(&self.original);
+        let sections: Vec<&str> = self.original.split(".").filter(|x| !x.is_empty()).collect();
+        let mut sections_count = sections.len();
+        if sections[0].len() < self.arrangement[0] {
+            sections_count -= 1;
+        }
+        if sections[sections.len() - 1].len() < self.arrangement[self.arrangement.len() - 1] {
+            sections_count -= 1;
+        }
+        if sections_count > 2 {
+            let mut first: &str = "";
+            let mut last: &str = "";
+            let mut idx: usize = 0;
+            let mut section_count: usize = 0;
+            for c in self.original.chars() {
+                if c == '.' {
+                    // if section_count > self.arrangement[0] {
+                    if idx - section_count >= self.arrangement[0] {
+                        // Found the sections that are large enough
+                        first = &self.original[0..=idx];
+                        last = &self.original[idx + 1..self.original.len()];
+                        break;
+                        // } else {
+                        //     section_count = 0;
+                    }
+                    section_count += 1;
+                }
+                idx += 1;
+            }
+            first = ReportLine::rem_first_and_last_str(first, ".");
+            // last = ReportLine::rem_first_and_last_str(last, ".");
+            let mut first_required_limit = first.split("#").filter(|x| !x.is_empty()).count() - 1;
+            if first.starts_with("#") {
+                first_required_limit += 1;
+            }
+            if first.ends_with("#") {
+                first_required_limit += 1;
+            }
+            // dbg!(&first_required_limit);
+            let mut last_required_limit = last.split("#").filter(|x| !x.is_empty()).count() - 1;
+            if last.starts_with("#") {
+                last_required_limit += 1;
+            }
+            if last.ends_with("#") {
+                last_required_limit += 1;
+            }
+            // dbg!(&last_required_limit);
+
+            let mut last_limit = self.arrangement.len();
+            if self.arrangement.len() == 2 {
+                last_limit = self.arrangement.len() - 1;
+            }
+            if self.arrangement.len() > 2 {
+                last_limit = self.arrangement.len() - 1;
+                if last_required_limit > 1 {
+                    // Adjust last_limit to include the len check
+                    let mut limit_size = self.arrangement[self.arrangement.len() - 1];
+                    // dbg!(&limit_size);
+                    let last_len = last.replace(".", "").len();
+                    (0..self.arrangement.len() - 1).rev().for_each(|x| {
+                        if last_len >= limit_size + self.arrangement[x] && x > 1 {
+                            last_limit = x;
+                        }
+                        limit_size += self.arrangement[x];
+                        // dbg!(&limit_size);
+                    });
+                }
+            }
+            let mut size: usize = self.arrangement[0]; // starting at the first size
+            let mut ending_idx: usize = 0;
+            if first_required_limit > 0
+                || (first_required_limit + last_required_limit + 1 < self.arrangement.len())
+                || (last_required_limit == 0 && first_required_limit == 0)
+            {
+                (1..last_limit).for_each(|x| {
+                    if first.len() >= size + self.arrangement[x] + x {
+                        size += self.arrangement[x];
+                        ending_idx += 1;
+                    }
+                });
+                // dbg!(&ending_idx);
+            }
+            let mut first_str = format!("{:?}", &self.arrangement[0..=ending_idx]);
+            first_str = first_str.replace("[", "").replace("]", "").replace(" ", "");
+            let mut last_str = format!(
+                "{:?}",
+                &self.arrangement[ending_idx + 1..self.arrangement.len()]
+            );
+            last_str = last_str.replace("[", "").replace("]", "").replace(" ", "");
+
+            let first_line: &str = &[first, " ", &first_str].concat();
+            // dbg!(&first_line);
+
+            let mid_line: String;
+            if last_str.len() > 0 {
+                mid_line = format!("{}?{} {},{}", last, first, last_str, first_str);
+            } else {
+                mid_line = format!("{} {}", first, first_str);
+            };
+
+            // dbg!(&mid_line);
+
+            let mut report = ReportLine::new();
+            report.from_input(first_line);
+            let first_count = report.get_count();
+            report.from_input(&mid_line);
+            let mid_count = report.get_count();
+
+            let last_count = if last_str.len() > 0 {
+                let last_line: &str = &[last, " ", &last_str].concat();
+                // dbg!(&last_line);
+                report.from_input(last_line);
+                report.get_count()
+            } else {
+                1
+            };
+
+            // dbg!(&first_count);
+            // dbg!(&mid_count);
+            // dbg!(&last_count);
+
+            let mut sum = mid_count.pow(4);
+            if first_count != 0 {
+                sum = sum * first_count
+            };
+            if last_count != 0 {
+                sum = sum * last_count
+            };
+
+            sum + 0
+        } else {
+            let first_count = self.get_count();
+            let mut report = ReportLine::new();
+
+            let mut arrangement_str = format!("{:?}", &self.arrangement[0..self.arrangement.len()]);
+            arrangement_str = arrangement_str
+                .replace("[", "")
+                .replace("]", "")
+                .replace(" ", "");
+            report.from_input(&[&self.original, "? ", &arrangement_str].concat());
+            let mid_count = report.get_count();
+            first_count * mid_count.pow(4)
+        }
+    }
+    fn rem_first_and_last_str<'a>(value: &'a str, lookup: &'a str) -> &'a str {
+        let mut chars = value.chars();
+        while chars.as_str().starts_with(lookup) {
+            chars.next();
+        }
+        while chars.as_str().ends_with(lookup) {
+            chars.next_back();
+        }
+        chars.as_str()
     }
 
     fn get_unique_permutations(&self) -> Vec<Vec<u8>> {
@@ -309,7 +485,9 @@ impl ReportLine {
         // '#' == Damaged == 0, '.' == Operational == 1
         let mut char_combination: Vec<u8> = Vec::new();
         (0..damaged_missing).for_each(|_| char_combination.push(0u8));
-        (0..skips_needed).for_each(|_| char_combination.push(1u8));
+        if skips_needed > 0 {
+            (0..skips_needed).for_each(|_| char_combination.push(1u8));
+        }
 
         // The sequence we are looking for from original
         let sequence_needed: Vec<(Spring, usize)> = self
@@ -407,7 +585,9 @@ impl FromStr for Report {
             .map(|line| {
                 let parts = line.split(' ').collect::<Vec<&str>>();
                 let mut new_line: ReportLine = ReportLine::new();
-                new_line.original = parts[0].to_string();
+                let stripped_input = ReportLine::rem_first_and_last_str(parts[0], ".");
+
+                new_line.original = stripped_input.to_string();
                 new_line.arrangement = parts[1]
                     .split(',')
                     .collect::<Vec<&str>>()
@@ -421,7 +601,7 @@ impl FromStr for Report {
                 let mut prev_char: char = 'S';
                 let mut sequence: Vec<(Spring, usize)> = Vec::new();
                 let mut last_spring_type: Spring = Spring::Operational;
-                parts[0].chars().for_each(|c| {
+                stripped_input.chars().for_each(|c| {
                     if prev_char != c {
                         if prev_char != 'S' {
                             // sequence has changed, store previous, start new
@@ -468,6 +648,54 @@ impl ReportLine {
             unknown: Vec::new(),
             damaged: Vec::new(),
         }
+    }
+    fn from_input(&mut self, input: &str) {
+        let parts = input.split(' ').collect::<Vec<&str>>();
+        let stripped_input = ReportLine::rem_first_and_last_str(parts[0], ".");
+        self.original = stripped_input.to_string();
+        self.arrangement = parts[1]
+            .split(',')
+            .collect::<Vec<&str>>()
+            .iter()
+            .map(|num| num.parse::<usize>().unwrap())
+            .collect::<Vec<usize>>();
+        let mut damaged: Vec<usize> = Vec::new();
+        let mut unknown: Vec<usize> = Vec::new();
+        let mut seq_count: usize = 0;
+        // We'll use S as a start previous char placebo
+        let mut prev_char: char = 'S';
+        let mut sequence: Vec<(Spring, usize)> = Vec::new();
+        let mut last_spring_type: Spring = Spring::Operational;
+        stripped_input.chars().for_each(|c| {
+            if prev_char != c {
+                if prev_char != 'S' {
+                    // sequence has changed, store previous, start new
+                    sequence.push((last_spring_type, seq_count));
+                }
+                prev_char = c.clone();
+            }
+            seq_count += 1;
+            match Spring::from(c) {
+                Ok(spring_type) => match spring_type {
+                    Spring::Damaged => {
+                        last_spring_type = Spring::Damaged;
+                        damaged.push(seq_count - 1);
+                    }
+                    Spring::Operational => {
+                        last_spring_type = Spring::Operational;
+                    }
+                    Spring::Unknown => {
+                        last_spring_type = Spring::Unknown;
+                        unknown.push(seq_count - 1);
+                    }
+                },
+                Err(_) => panic!("invalid input"),
+            };
+        });
+        sequence.push((last_spring_type, seq_count));
+        self.sequence = sequence;
+        self.unknown = unknown;
+        self.damaged = damaged;
     }
 }
 
@@ -549,9 +777,13 @@ mod tests {
 ????.#...#... 4,1,1
 ????.######..#####. 1,6,5
 ?###???????? 3,2,1
-?###??????????###???????? 3,2,1,3,2,1";
+????.######..#####.?????.######..#####.?????.######..#####.?????.######..#####.?????.######..#####. 1,6,5,1,6,5,1,6,5,1,6,5,1,6,5
+?###??????????###???????? 3,2,1,3,2,1
+?????#?..???????##????????#?..???????##????????#?..???????##????????#?..???????##????????#?..???????##?? 4,1,1,6,4,1,1,6,4,1,1,6,4,1,1,6,4,1,1,6
+???.???????.#.#?#?.????.???????.#.#?#?.????.???????.#.#?#?.????.???????.#.#?#?.????.???????.#.#?#?. 1,3,1,1,1,1,1,3,1,1,1,1,1,3,1,1,1,1,1,3,1,1,1,1,1,3,1,1,1,1
+.???.#.#??????.????.???.#.#??????.????.???.#.#??????.????.???.#.#??????.????.???.#.#??????.??? 3,1,1,1,1,1,3,1,1,1,1,1,3,1,1,1,1,1,3,1,1,1,1,1,3,1,1,1,1,1";
         let result = Report::from_str(input).unwrap();
-        assert_eq!(result.lines.len(), 7);
+        assert_eq!(result.lines.len(), 10);
         assert_eq!(result.lines[0].iterate_sum(5), 1);
         assert_eq!(result.lines[1].iterate_sum(5), 16384);
         assert_eq!(result.lines[2].iterate_sum(5), 1);
@@ -560,5 +792,8 @@ mod tests {
         assert_eq!(result.lines[6].get_count(), 150);
         assert_eq!(result.lines[5].iterate_sum(2), 150);
         assert_eq!(result.lines[5].iterate_sum(5), 506250);
+        assert_eq!(result.lines[7].get_count(), 7795537);
+        assert_eq!(result.lines[8].get_count(), 7421875);
+        assert_eq!(result.lines[9].get_count(), 61440000);
     }
 }
