@@ -504,7 +504,19 @@ impl ReportLine {
 
         // Strip all duplicate Operational from the original and get the section vec of the &str's
         let original = &self.original;
-        let vec_original: Vec<&str> = self.original.split(".").filter(|s| !s.is_empty()).collect();
+        let mut vec_original: Vec<&str> =
+            self.original.split(".").filter(|s| !s.is_empty()).collect();
+
+        // Handle if last section is unknown and they are the same len
+        // Example: input line 9: #????#??..????? 1,2
+        if vec_original.len() == self.arrangement.len()
+            && vec_original[vec_original.len() - 1]
+                .replace("?", "")
+                .is_empty()
+        {
+            vec_original = Vec::new();
+            vec_original.push(&original);
+        }
 
         // check for conditions to assign the strings
         if vec_original.len() == 1 {
@@ -570,36 +582,60 @@ impl ReportLine {
             ]
             .concat();
         } else {
+            dbg!("In here now");
             // map arrangements to the lengths for the ending to get the groups for the start, end
             let mut size = 0;
-            // let mut vec_idx = 0;
-            // let mut arrangement_idx = 0;
-            // while vec_idx < vec_original.len() - 2
-            //     && size <= (0..self.arrangement.len() - 1).map(|x| x).sum()
-            // {
-            //     if vec_original[vec_idx].len() < self.arrangement[arrangement_idx] {
-            //         // Then the current vec location is operational, go next
-            //         vec_idx += 1;
-            //     } else {
-            //         size += self.arrangement[arrangement_idx];
-            //     }
-            //     arrangement_idx += 1;
-            // }
-            let mut vec_idx = vec_original.len() - 1;
-            let mut arrangement_idx = self.arrangement.len();
-            while vec_original[vec_idx].len() > size {
-                arrangement_idx -= 1;
+
+            let mut vec_idx = 0;
+            let mut arrangement_idx = 0;
+            let mut current_size = self.arrangement[arrangement_idx];
+
+            while vec_idx <= vec_original.len() - 2
+            // && size <= (0..self.arrangement.len() - 1).map(|x| x).sum()
+            {
                 if vec_original[vec_idx].len() < self.arrangement[arrangement_idx] {
                     // Then the current vec location is operational, go next
-                    vec_idx -= 1;
+                    vec_idx += 1;
                 } else {
+                    dbg!(&vec_idx);
+                    dbg!(&vec_original[vec_idx].len());
+                    dbg!(current_size + self.arrangement[arrangement_idx + 1] + 1);
+                    if vec_original[vec_idx].len()
+                        >= current_size + self.arrangement[arrangement_idx + 1] + 1
+                    {
+                        // add the operator count to the size
+                        current_size += self.arrangement[arrangement_idx + 1] + 1
+                    } else {
+                        vec_idx += 1;
+                        current_size = self.arrangement[arrangement_idx + 1]
+                    }
+                    arrangement_idx += 1;
                     size += self.arrangement[arrangement_idx];
                 }
             }
+            // back out the arrangement index if there is a required size on the last vec length
+            if arrangement_idx == self.arrangement.len() - 1
+                && !vec_original[vec_original.len() - 1]
+                    .replace("?", "")
+                    .replace(".", "")
+                    .is_empty()
+            {
+                let total_needed = vec_original[vec_original.len() - 1].replace(".", "").len();
+                let mut size = self.arrangement[arrangement_idx];
+                while total_needed > size && arrangement_idx > 1 {
+                    if total_needed > size + self.arrangement[arrangement_idx - 1] + 1 {
+                        arrangement_idx -= 1;
+                    }
+                    size += self.arrangement[arrangement_idx] + 1;
+                }
+            }
+
             dbg!(&original);
             dbg!(&arrangement_idx);
-            if vec_idx > 2 {
-                (0..vec_idx - 2).for_each(|i| {
+            dbg!(&vec_idx);
+
+            if vec_idx > 0 {
+                (0..vec_idx - 1).for_each(|i| {
                     first_line = [
                         first_line.clone(),
                         vec_original[i].to_owned(),
@@ -607,8 +643,10 @@ impl ReportLine {
                     ]
                     .concat();
                 });
+                first_line = [first_line.clone(), vec_original[vec_idx - 1].to_owned()].concat();
+            } else {
+                first_line = vec_original[0].to_owned();
             }
-            first_line = [first_line.clone(), vec_original[vec_idx - 1].to_owned()].concat();
             // add back the beginning and ending operational char
             if original.starts_with(".") {
                 first_line = [".", &first_line].concat();
@@ -623,15 +661,19 @@ impl ReportLine {
                     ]
                     .concat();
                 });
+                third_line = [
+                    third_line.clone(),
+                    vec_original[vec_original.len() - 1].to_owned(),
+                ]
+                .concat();
             } else {
                 // only one so we add the operational seperator
-                third_line = [".".to_owned(), third_line.clone()].concat()
+                third_line = [
+                    ".".to_owned(),
+                    vec_original[vec_original.len() - 1].to_owned(),
+                ]
+                .concat()
             }
-            third_line = [
-                third_line.clone(),
-                vec_original[vec_original.len() - 1].to_owned(),
-            ]
-            .concat();
             if original.ends_with(".") {
                 third_line = [&third_line, "."].concat();
             }
@@ -1089,6 +1131,9 @@ mod tests {
 ????.######..#####. 1,6,5
 ?###???????? 3,2,1
 .?###????????. 3,2,1
+???????#??.???#? 2,2,4,3
+#????#??..????? 1,2
+???.???????.#.#?#?. 1,3,1,1,1,1
 ";
         let result = Report::from_str(input).unwrap();
         assert_eq!(
@@ -1145,6 +1190,32 @@ mod tests {
                 ".?###????????. 3,2,1".to_string(),
                 ".?###????????.? 3,2,1".to_string(),
                 "".to_string()
+            )
+        );
+        assert_eq!(
+            result.lines[7].get_pattern_lines(),
+            (
+                "???????#?? 2,2,4".to_string(),
+                ".???#?????????#?? 3,2,2,4".to_string(),
+                ".???#? 3".to_string()
+            )
+        );
+        // #????#??..????? 1,2
+        assert_eq!(
+            result.lines[8].get_pattern_lines(),
+            (
+                "#????#??..????? 1,2".to_string(),
+                "#????#??..?????? 1,2".to_string(),
+                "".to_string()
+            )
+        );
+        // ???.???????.#.#?#?. 1,3,1,1,1,1
+        assert_eq!(
+            result.lines[9].get_pattern_lines(),
+            (
+                "???.???????.# 1,3,1,1".to_string(),
+                ".#?#?.????.???????.# 1,1,1,3,1,1".to_string(),
+                ".#?#?. 1,1".to_string()
             )
         );
     }
