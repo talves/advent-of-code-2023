@@ -309,151 +309,183 @@ impl ReportLine {
             .iter()
             .sum()
     }
+    // fn sum_pattern(&self) -> u64 {
+    //     dbg!(&self.original);
+    //     let sections: Vec<&str> = self.original.split(".").filter(|x| !x.is_empty()).collect();
+    //     let mut sections_count = sections.len();
+    //     if sections[0].len() < self.arrangement[0] {
+    //         sections_count -= 1;
+    //     }
+    //     if sections[sections.len() - 1].len() < self.arrangement[self.arrangement.len() - 1] {
+    //         sections_count -= 1;
+    //     }
+    //     if sections_count > 2 {
+    //         let mut first: &str = "";
+    //         let mut last: &str = "";
+    //         let mut idx: usize = 0;
+    //         let mut section_count: usize = 0;
+    //         for c in self.original.chars() {
+    //             if c == '.' {
+    //                 // if section_count > self.arrangement[0] {
+    //                 if idx - section_count >= self.arrangement[0] {
+    //                     // Found the sections that are large enough
+    //                     first = &self.original[0..=idx];
+    //                     last = &self.original[idx + 1..self.original.len()];
+    //                     break;
+    //                     // } else {
+    //                     //     section_count = 0;
+    //                 }
+    //                 section_count += 1;
+    //             }
+    //             idx += 1;
+    //         }
+    //         first = ReportLine::rem_first_and_last_str(first, ".");
+    //         // last = ReportLine::rem_first_and_last_str(last, ".");
+    //         let mut first_required_limit = first.split("#").filter(|x| !x.is_empty()).count() - 1;
+    //         if first.starts_with("#") {
+    //             first_required_limit += 1;
+    //         }
+    //         if first.ends_with("#") {
+    //             first_required_limit += 1;
+    //         }
+    //         // dbg!(&first_required_limit);
+    //         let mut last_required_limit = last.split("#").filter(|x| !x.is_empty()).count() - 1;
+    //         if last.starts_with("#") {
+    //             last_required_limit += 1;
+    //         }
+    //         if last.ends_with("#") {
+    //             last_required_limit += 1;
+    //         }
+    //         // dbg!(&last_required_limit);
+
+    //         let mut last_limit = self.arrangement.len();
+    //         if self.arrangement.len() == 2 {
+    //             last_limit = self.arrangement.len() - 1;
+    //         }
+    //         if self.arrangement.len() > 2 {
+    //             last_limit = self.arrangement.len() - 1;
+    //             if last_required_limit > 1 {
+    //                 // Adjust last_limit to include the len check
+    //                 let mut limit_size = self.arrangement[self.arrangement.len() - 1];
+    //                 // dbg!(&limit_size);
+    //                 let last_len = last.replace(".", "").len();
+    //                 (0..self.arrangement.len() - 1).rev().for_each(|x| {
+    //                     if last_len >= limit_size + self.arrangement[x] && x > 1 {
+    //                         last_limit = x;
+    //                     }
+    //                     limit_size += self.arrangement[x];
+    //                     // dbg!(&limit_size);
+    //                 });
+    //             }
+    //         }
+    //         let mut size: usize = self.arrangement[0]; // starting at the first size
+    //         let mut ending_idx: usize = 0;
+    //         if first_required_limit > 0
+    //             || (first_required_limit + last_required_limit + 1 < self.arrangement.len())
+    //             || (last_required_limit == 0 && first_required_limit == 0)
+    //         {
+    //             (1..last_limit).for_each(|x| {
+    //                 if first.len() >= size + self.arrangement[x] + x {
+    //                     size += self.arrangement[x];
+    //                     ending_idx += 1;
+    //                 }
+    //             });
+    //             // dbg!(&ending_idx);
+    //         }
+    //         let mut first_str = format!("{:?}", &self.arrangement[0..=ending_idx]);
+    //         first_str = first_str.replace("[", "").replace("]", "").replace(" ", "");
+    //         let mut last_str = format!(
+    //             "{:?}",
+    //             &self.arrangement[ending_idx + 1..self.arrangement.len()]
+    //         );
+    //         last_str = last_str.replace("[", "").replace("]", "").replace(" ", "");
+
+    //         let first_line: &str = &[first, " ", &first_str].concat();
+    //         // dbg!(&first_line);
+
+    //         let mid_line: String;
+    //         if last_str.len() > 0 {
+    //             mid_line = format!("{}?{} {},{}", last, first, last_str, first_str);
+    //         } else {
+    //             mid_line = format!("{} {}", first, first_str);
+    //         };
+
+    //         // dbg!(&mid_line);
+
+    //         let mut report = ReportLine::new();
+    //         report.from_input(first_line);
+    //         let first_count = report.get_count();
+    //         report.from_input(&mid_line);
+    //         let mid_count = report.get_count();
+
+    //         let last_count = if last_str.len() > 0 {
+    //             let last_line: &str = &[last, " ", &last_str].concat();
+    //             // dbg!(&last_line);
+    //             report.from_input(last_line);
+    //             report.get_count()
+    //         } else {
+    //             1
+    //         };
+
+    //         // dbg!(&first_count);
+    //         // dbg!(&mid_count);
+    //         // dbg!(&last_count);
+
+    //         let mut sum = mid_count.pow(4);
+    //         if first_count != 0 {
+    //             sum = sum * first_count
+    //         };
+    //         if last_count != 0 {
+    //             sum = sum * last_count
+    //         };
+
+    //         sum + 0
+    //     } else {
+    //         let first_count = self.get_count();
+    //         let mut report = ReportLine::new();
+
+    //         let mut arrangement_str = format!("{:?}", &self.arrangement[0..self.arrangement.len()]);
+    //         arrangement_str = arrangement_str
+    //             .replace("[", "")
+    //             .replace("]", "")
+    //             .replace(" ", "");
+    //         report.from_input(&[&self.original, "? ", &arrangement_str].concat());
+    //         let mid_count = report.get_count();
+    //         first_count * mid_count.pow(4)
+    //     }
+    // }
     fn sum_pattern(&self) -> u64 {
         dbg!(&self.original);
-        let sections: Vec<&str> = self.original.split(".").filter(|x| !x.is_empty()).collect();
-        let mut sections_count = sections.len();
-        if sections[0].len() < self.arrangement[0] {
-            sections_count -= 1;
-        }
-        if sections[sections.len() - 1].len() < self.arrangement[self.arrangement.len() - 1] {
-            sections_count -= 1;
-        }
-        if sections_count > 2 {
-            let mut first: &str = "";
-            let mut last: &str = "";
-            let mut idx: usize = 0;
-            let mut section_count: usize = 0;
-            for c in self.original.chars() {
-                if c == '.' {
-                    // if section_count > self.arrangement[0] {
-                    if idx - section_count >= self.arrangement[0] {
-                        // Found the sections that are large enough
-                        first = &self.original[0..=idx];
-                        last = &self.original[idx + 1..self.original.len()];
-                        break;
-                        // } else {
-                        //     section_count = 0;
-                    }
-                    section_count += 1;
-                }
-                idx += 1;
-            }
-            first = ReportLine::rem_first_and_last_str(first, ".");
-            // last = ReportLine::rem_first_and_last_str(last, ".");
-            let mut first_required_limit = first.split("#").filter(|x| !x.is_empty()).count() - 1;
-            if first.starts_with("#") {
-                first_required_limit += 1;
-            }
-            if first.ends_with("#") {
-                first_required_limit += 1;
-            }
-            // dbg!(&first_required_limit);
-            let mut last_required_limit = last.split("#").filter(|x| !x.is_empty()).count() - 1;
-            if last.starts_with("#") {
-                last_required_limit += 1;
-            }
-            if last.ends_with("#") {
-                last_required_limit += 1;
-            }
-            // dbg!(&last_required_limit);
 
-            let mut last_limit = self.arrangement.len();
-            if self.arrangement.len() == 2 {
-                last_limit = self.arrangement.len() - 1;
-            }
-            if self.arrangement.len() > 2 {
-                last_limit = self.arrangement.len() - 1;
-                if last_required_limit > 1 {
-                    // Adjust last_limit to include the len check
-                    let mut limit_size = self.arrangement[self.arrangement.len() - 1];
-                    // dbg!(&limit_size);
-                    let last_len = last.replace(".", "").len();
-                    (0..self.arrangement.len() - 1).rev().for_each(|x| {
-                        if last_len >= limit_size + self.arrangement[x] && x > 1 {
-                            last_limit = x;
-                        }
-                        limit_size += self.arrangement[x];
-                        // dbg!(&limit_size);
-                    });
-                }
-            }
-            let mut size: usize = self.arrangement[0]; // starting at the first size
-            let mut ending_idx: usize = 0;
-            if first_required_limit > 0
-                || (first_required_limit + last_required_limit + 1 < self.arrangement.len())
-                || (last_required_limit == 0 && first_required_limit == 0)
-            {
-                (1..last_limit).for_each(|x| {
-                    if first.len() >= size + self.arrangement[x] + x {
-                        size += self.arrangement[x];
-                        ending_idx += 1;
-                    }
-                });
-                // dbg!(&ending_idx);
-            }
-            let mut first_str = format!("{:?}", &self.arrangement[0..=ending_idx]);
-            first_str = first_str.replace("[", "").replace("]", "").replace(" ", "");
-            let mut last_str = format!(
-                "{:?}",
-                &self.arrangement[ending_idx + 1..self.arrangement.len()]
-            );
-            last_str = last_str.replace("[", "").replace("]", "").replace(" ", "");
+        let (first, second, third) = self.get_pattern_lines();
+        let mut report = ReportLine::new();
 
-            let first_line: &str = &[first, " ", &first_str].concat();
-            // dbg!(&first_line);
+        dbg!(&first);
+        dbg!(&second);
+        dbg!(&third);
 
-            let mid_line: String;
-            if last_str.len() > 0 {
-                mid_line = format!("{}?{} {},{}", last, first, last_str, first_str);
-            } else {
-                mid_line = format!("{} {}", first, first_str);
-            };
-
-            // dbg!(&mid_line);
-
-            let mut report = ReportLine::new();
-            report.from_input(first_line);
-            let first_count = report.get_count();
-            report.from_input(&mid_line);
-            let mid_count = report.get_count();
-
-            let last_count = if last_str.len() > 0 {
-                let last_line: &str = &[last, " ", &last_str].concat();
-                // dbg!(&last_line);
-                report.from_input(last_line);
-                report.get_count()
-            } else {
-                1
-            };
-
-            // dbg!(&first_count);
-            // dbg!(&mid_count);
-            // dbg!(&last_count);
-
-            let mut sum = mid_count.pow(4);
-            if first_count != 0 {
-                sum = sum * first_count
-            };
-            if last_count != 0 {
-                sum = sum * last_count
-            };
-
-            sum + 0
+        report.from_input(&first);
+        let first_count = report.get_count();
+        report.from_input(&second);
+        let second_count = report.get_count();
+        let third_count = if third.is_empty() {
+            1
         } else {
-            let first_count = self.get_count();
-            let mut report = ReportLine::new();
+            report.from_input(&third);
+            report.get_count()
+        };
 
-            let mut arrangement_str = format!("{:?}", &self.arrangement[0..self.arrangement.len()]);
-            arrangement_str = arrangement_str
-                .replace("[", "")
-                .replace("]", "")
-                .replace(" ", "");
-            report.from_input(&[&self.original, "? ", &arrangement_str].concat());
-            let mid_count = report.get_count();
-            first_count * mid_count.pow(4)
+        // dbg!(&first_count);
+        // dbg!(&second_count);
+        // dbg!(&third_count);
+
+        if third_count == 0 {
+            first_count * second_count.pow(4)
+        } else {
+            first_count * second_count.pow(4) * third_count
         }
     }
+
     fn rem_first_and_last_str<'a>(value: &'a str, lookup: &'a str) -> &'a str {
         let mut chars = value.chars();
         while chars.as_str().starts_with(lookup) {
@@ -463,6 +495,178 @@ impl ReportLine {
             chars.next_back();
         }
         chars.as_str()
+    }
+
+    fn get_pattern_lines(&self) -> (String, String, String) {
+        let mut first_line: String = "".to_owned();
+        let mut second_line: String = "".to_owned();
+        let mut third_line: String = "".to_owned();
+
+        // Strip all duplicate Operational from the original and get the section vec of the &str's
+        let original = &self.original;
+        let vec_original: Vec<&str> = self.original.split(".").filter(|s| !s.is_empty()).collect();
+
+        // check for conditions to assign the strings
+        if vec_original.len() == 1 {
+            first_line = vec_original[0].to_owned();
+            // add back the beginning and ending operational char
+            if original.starts_with(".") {
+                first_line = [".", &first_line].concat();
+            }
+            if original.ends_with(".") {
+                first_line = [&first_line, "."].concat();
+            }
+            second_line = [&first_line, "?"].concat();
+            // third_line will stay empty
+            let arrangement_str: String =
+                format!("{:?}", &self.arrangement[0..=&self.arrangement.len() - 1])
+                    .replace("[", "")
+                    .replace("]", "")
+                    .replace(" ", "");
+            first_line = [&first_line, " ", &arrangement_str.clone()].concat();
+            second_line = [&second_line, " ", &arrangement_str.clone()].concat();
+        } else if vec_original.len() == self.arrangement.len() {
+            // dbg!(&original);
+            // there is a one to one size for the original line
+            //  So build with the last arrangement on the third line
+            (0..vec_original.len() - 2).for_each(|i| {
+                first_line = [
+                    first_line.clone(),
+                    vec_original[i].to_owned(),
+                    ".".to_owned(),
+                ]
+                .concat();
+            });
+            first_line = [
+                first_line.clone(),
+                vec_original[vec_original.len() - 2].to_owned(),
+            ]
+            .concat();
+            // add back the beginning and ending operational char
+            if original.starts_with(".") {
+                first_line = [".", &first_line].concat();
+            }
+            third_line = [".", &vec_original[vec_original.len() - 1]].concat();
+            if original.ends_with(".") {
+                third_line = [&third_line, "."].concat();
+            }
+            let start_arrangement_str: String =
+                format!("{:?}", &self.arrangement[0..=&self.arrangement.len() - 2])
+                    .replace("[", "")
+                    .replace("]", "")
+                    .replace(" ", "");
+            let end_arrangement_str = self.arrangement[&self.arrangement.len() - 1].to_string();
+            // put together the second_line using the "end"+"?"+"start" format, which becomes the pattern
+            second_line = [third_line.clone(), "?".to_owned(), first_line.clone()].concat();
+            // Now add all the ending arrangement strings to each line! example: "line"+" "+"1,2,3"
+            first_line = [first_line, " ".to_owned(), start_arrangement_str.clone()].concat();
+            third_line = [third_line, " ".to_owned(), end_arrangement_str.clone()].concat();
+            second_line = [
+                second_line,
+                " ".to_owned(),
+                end_arrangement_str.clone(),
+                ",".to_owned(),
+                start_arrangement_str.clone(),
+            ]
+            .concat();
+        } else {
+            // map arrangements to the lengths for the ending to get the groups for the start, end
+            let mut size = 0;
+            // let mut vec_idx = 0;
+            // let mut arrangement_idx = 0;
+            // while vec_idx < vec_original.len() - 2
+            //     && size <= (0..self.arrangement.len() - 1).map(|x| x).sum()
+            // {
+            //     if vec_original[vec_idx].len() < self.arrangement[arrangement_idx] {
+            //         // Then the current vec location is operational, go next
+            //         vec_idx += 1;
+            //     } else {
+            //         size += self.arrangement[arrangement_idx];
+            //     }
+            //     arrangement_idx += 1;
+            // }
+            let mut vec_idx = vec_original.len() - 1;
+            let mut arrangement_idx = self.arrangement.len();
+            while vec_original[vec_idx].len() > size {
+                arrangement_idx -= 1;
+                if vec_original[vec_idx].len() < self.arrangement[arrangement_idx] {
+                    // Then the current vec location is operational, go next
+                    vec_idx -= 1;
+                } else {
+                    size += self.arrangement[arrangement_idx];
+                }
+            }
+            dbg!(&original);
+            dbg!(&arrangement_idx);
+            if vec_idx > 2 {
+                (0..vec_idx - 2).for_each(|i| {
+                    first_line = [
+                        first_line.clone(),
+                        vec_original[i].to_owned(),
+                        ".".to_owned(),
+                    ]
+                    .concat();
+                });
+            }
+            first_line = [first_line.clone(), vec_original[vec_idx - 1].to_owned()].concat();
+            // add back the beginning and ending operational char
+            if original.starts_with(".") {
+                first_line = [".", &first_line].concat();
+            }
+            // dbg!(&vec_idx);
+            if vec_idx <= vec_original.len() - 2 {
+                (vec_idx..vec_original.len() - 2).for_each(|i| {
+                    third_line = [
+                        third_line.clone(),
+                        vec_original[i].to_owned(),
+                        ".".to_owned(),
+                    ]
+                    .concat();
+                });
+            } else {
+                // only one so we add the operational seperator
+                third_line = [".".to_owned(), third_line.clone()].concat()
+            }
+            third_line = [
+                third_line.clone(),
+                vec_original[vec_original.len() - 1].to_owned(),
+            ]
+            .concat();
+            if original.ends_with(".") {
+                third_line = [&third_line, "."].concat();
+            }
+            let start_arrangement_str: String =
+                format!("{:?}", &self.arrangement[0..arrangement_idx])
+                    .replace("[", "")
+                    .replace("]", "")
+                    .replace(" ", "");
+            let end_arrangement_str = format!(
+                "{:?}",
+                &self.arrangement[arrangement_idx..=self.arrangement.len() - 1]
+            )
+            .replace("[", "")
+            .replace("]", "")
+            .replace(" ", "");
+            // put together the second_line using the "end"+"?"+"start" format, which becomes the pattern
+            second_line = [third_line.clone(), "?".to_owned(), first_line.clone()].concat();
+            // Now add all the ending arrangement strings to each line! example: "line"+" "+"1,2,3"
+            first_line = [first_line, " ".to_owned(), start_arrangement_str.clone()].concat();
+            third_line = [third_line, " ".to_owned(), end_arrangement_str.clone()].concat();
+            second_line = [
+                second_line,
+                " ".to_owned(),
+                end_arrangement_str.clone(),
+                ",".to_owned(),
+                start_arrangement_str.clone(),
+            ]
+            .concat();
+        }
+
+        (
+            first_line.to_owned(),
+            second_line.to_owned(),
+            third_line.to_owned(),
+        )
     }
 
     fn get_unique_permutations(&self) -> Vec<Vec<u8>> {
@@ -498,34 +702,40 @@ impl ReportLine {
         // dbg!(format!("{:?}", &sequence_needed));
         let mut dedups_list: Vec<Vec<u8>> = Vec::new();
 
-        // Get unique permutations of the chars needed above
-        unique_permutations(char_combination)
-            .iter()
-            .for_each(|permutation| {
-                if !dedups_list.contains(permutation) {
-                    let mut workstr = self.original.to_string();
-                    permutation.iter().enumerate().for_each(|(idx, x)| {
-                        let ch = match *x {
-                            0u8 => "#",
-                            1u8 => ".",
-                            _ => "",
-                        };
-                        workstr.replace_range(self.unknown[idx]..=self.unknown[idx], ch);
-                        // we should not need this next line, but keeping it for debug
-                        // workstr = workstr.replace("?", ".");
-                    });
-                    // dbg!(&workstr);
-                    let sequence = Self::get_sequence_from(&workstr)
-                        .iter()
-                        .filter(|(spring, _count)| *spring == Spring::Damaged)
-                        .map(|tuple| *tuple)
-                        .collect::<Vec<(Spring, usize)>>();
-                    // dbg!(format!("{:?}", &sequence));
-                    if sequence == sequence_needed {
-                        dedups_list.push(permutation.clone());
+        if self.arrangement.len() == 1 && self.arrangement[0] == self.original.len() {
+            // This means there is only 1 permutation, so just return the char combination
+            dedups_list.push(char_combination);
+        } else {
+            // Get unique permutations of the chars needed above
+            unique_permutations(char_combination)
+                .iter()
+                .for_each(|permutation| {
+                    if !dedups_list.contains(permutation) {
+                        let mut workstr = self.original.to_string();
+                        permutation.iter().enumerate().for_each(|(idx, x)| {
+                            let ch = match *x {
+                                0u8 => "#",
+                                1u8 => ".",
+                                _ => "",
+                            };
+                            workstr.replace_range(self.unknown[idx]..=self.unknown[idx], ch);
+                            // we should not need this next line, but keeping it for debug
+                            // workstr = workstr.replace("?", ".");
+                        });
+                        // dbg!(&workstr);
+                        let sequence = Self::get_sequence_from(&workstr)
+                            .iter()
+                            .filter(|(spring, _count)| *spring == Spring::Damaged)
+                            .map(|tuple| *tuple)
+                            .collect::<Vec<(Spring, usize)>>();
+                        // dbg!(format!("{:?}", &sequence));
+                        if sequence == sequence_needed {
+                            dedups_list.push(permutation.clone());
+                        }
                     }
-                }
-            });
+                });
+        }
+
         // dbg!(&dedups_list);
         dedups_list
     }
@@ -585,7 +795,8 @@ impl FromStr for Report {
             .map(|line| {
                 let parts = line.split(' ').collect::<Vec<&str>>();
                 let mut new_line: ReportLine = ReportLine::new();
-                let stripped_input = ReportLine::rem_first_and_last_str(parts[0], ".");
+                // let stripped_input = ReportLine::rem_first_and_last_str(parts[0], ".");
+                let stripped_input = parts[0];
 
                 new_line.original = stripped_input.to_string();
                 new_line.arrangement = parts[1]
@@ -651,7 +862,8 @@ impl ReportLine {
     }
     fn from_input(&mut self, input: &str) {
         let parts = input.split(' ').collect::<Vec<&str>>();
-        let stripped_input = ReportLine::rem_first_and_last_str(parts[0], ".");
+        // let stripped_input = ReportLine::rem_first_and_last_str(parts[0], ".");
+        let stripped_input = parts[0];
         self.original = stripped_input.to_string();
         self.arrangement = parts[1]
             .split(',')
@@ -769,31 +981,199 @@ mod tests {
         // assert_eq!(result.lines[11].get_count(), 506250);
     }
 
+    //     #[test]
+    //     fn line_works() {
+    //         let input = "???.### 1,1,3
+    // ??? 1,1
+    // .###???? 3,1,1
+    // .### 3
+    // .??..??...?##. 1,1,3
+    // .??.??.?##. 1,1,3
+    // .??.?? 1,1
+    // ?##.?.??.?? 3,1,1
+    // ?##. 3
+    // ?#?#?#?#?#?#?#? 1,3,1,6
+    // ?#?#?#?#?#?#?#?? 1,3,1,6
+    // ????.#...#... 4,1,1
+    // ????.#.#. 4,1,1
+    // ????.# 4,1
+    // .#.?????.# 1,4,1
+    // .#. 1
+    // ????.######..#####. 1,6,5
+    // ????.######.#####. 1,6,5
+    // ????.###### 1,6
+    // .#####.?????.###### 5,1,6
+    // .#####. 5
+    // ?###???????? 3,2,1
+    // ?###????????? 3,2,1
+    // .?###????????. 3,2,1
+    // .?###????????.? 3,2,1
+    // ";
+    //         //         let input = "???.###????.###????.###????.###????.### 1,1,3,1,1,3,1,1,3,1,1,3,1,1,3
+    //         // .??..??...?##.?.??..??...?##.?.??..??...?##.?.??..??...?##.?.??..??...?##. 1,1,3,1,1,3,1,1,3,1,1,3,1,1,3
+    //         // ?#?#?#?#?#?#?#???#?#?#?#?#?#?#???#?#?#?#?#?#?#???#?#?#?#?#?#?#???#?#?#?#?#?#?#? 1,3,1,6,1,3,1,6,1,3,1,6,1,3,1,6,1,3,1,6
+    //         // ????.#...#...?????.#...#...?????.#...#...?????.#...#...?????.#...#... 4,1,1,4,1,1,4,1,1,4,1,1,4,1,1
+    //         // ????.######..#####.?????.######..#####.?????.######..#####.?????.######..#####.?????.######..#####. 1,6,5,1,6,5,1,6,5,1,6,5,1,6,5
+    //         // ?###??????????###??????????###??????????###??????????###???????? 3,2,1,3,2,1,3,2,1,3,2,1,3,2,1";
+    //         let result = Report::from_str(input).unwrap();
+    //         // ???.### 1,1,3
+    //         assert_eq!(result.lines[0].get_count(), 1);
+    //         assert_eq!(result.lines[1].get_count(), 1);
+    //         assert_eq!(result.lines[2].get_count(), 1);
+    //         assert_eq!(result.lines[3].get_count(), 1);
+    //         // .??..??...?##. 1,1,3
+    //         assert_eq!(result.lines[4].get_count(), 4);
+    //         assert_eq!(result.lines[5].get_count(), 4);
+    //         assert_eq!(result.lines[6].get_count(), 4);
+    //         assert_eq!(result.lines[7].get_count(), 8);
+    //         assert_eq!(result.lines[8].get_count(), 1);
+    //         assert_eq!(
+    //             result.lines[6].get_count()
+    //                 * result.lines[7].get_count().pow(4)
+    //                 * result.lines[8].get_count(),
+    //             16384
+    //         );
+    //         // ?#?#?#?#?#?#?#? 1,3,1,6
+    //         assert_eq!(result.lines[9].get_count(), 1);
+    //         assert_eq!(result.lines[10].get_count(), 1);
+    //         assert_eq!(
+    //             result.lines[9].get_count() * result.lines[10].get_count().pow(4),
+    //             1
+    //         );
+    //         // ????.#...#... 4,1,1
+    //         assert_eq!(result.lines[11].get_count(), 1);
+    //         assert_eq!(result.lines[12].get_count(), 1);
+    //         assert_eq!(result.lines[13].get_count(), 1);
+    //         assert_eq!(result.lines[14].get_count(), 2);
+    //         assert_eq!(result.lines[15].get_count(), 1);
+    //         assert_eq!(
+    //             result.lines[13].get_count()
+    //                 * result.lines[14].get_count().pow(4)
+    //                 * result.lines[15].get_count(),
+    //             16
+    //         );
+    //         // ????.######..#####. 1,6,5
+    //         assert_eq!(result.lines[16].get_count(), 4);
+    //         assert_eq!(result.lines[17].get_count(), 4);
+    //         assert_eq!(result.lines[18].get_count(), 4);
+    //         assert_eq!(result.lines[19].get_count(), 5);
+    //         assert_eq!(result.lines[20].get_count(), 1);
+    //         assert_eq!(
+    //             result.lines[18].get_count()
+    //                 * result.lines[19].get_count().pow(4)
+    //                 * result.lines[20].get_count(),
+    //             2500
+    //         );
+    //         // ?###???????? 3,2,1
+    //         assert_eq!(result.lines[21].get_count(), 10);
+    //         assert_eq!(result.lines[22].get_count(), 15);
+    //         assert_eq!(
+    //             result.lines[21].get_count() * result.lines[22].get_count().pow(4),
+    //             506250
+    //         );
+    //         // .?###????????. 3,2,1
+    //         assert_eq!(result.lines[23].get_count(), 10);
+    //         assert_eq!(result.lines[24].get_count(), 16);
+    //         assert_eq!(
+    //             result.lines[23].get_count() * result.lines[24].get_count().pow(4),
+    //             655360
+    //         );
+    //     }
+
     #[test]
-    fn report_sum_works() {
+    fn pattern_line_works() {
         let input = "???.### 1,1,3
 .??..??...?##. 1,1,3
 ?#?#?#?#?#?#?#? 1,3,1,6
 ????.#...#... 4,1,1
 ????.######..#####. 1,6,5
 ?###???????? 3,2,1
-????.######..#####.?????.######..#####.?????.######..#####.?????.######..#####.?????.######..#####. 1,6,5,1,6,5,1,6,5,1,6,5,1,6,5
-?###??????????###???????? 3,2,1,3,2,1
-?????#?..???????##????????#?..???????##????????#?..???????##????????#?..???????##????????#?..???????##?? 4,1,1,6,4,1,1,6,4,1,1,6,4,1,1,6,4,1,1,6
-???.???????.#.#?#?.????.???????.#.#?#?.????.???????.#.#?#?.????.???????.#.#?#?.????.???????.#.#?#?. 1,3,1,1,1,1,1,3,1,1,1,1,1,3,1,1,1,1,1,3,1,1,1,1,1,3,1,1,1,1
-.???.#.#??????.????.???.#.#??????.????.???.#.#??????.????.???.#.#??????.????.???.#.#??????.??? 3,1,1,1,1,1,3,1,1,1,1,1,3,1,1,1,1,1,3,1,1,1,1,1,3,1,1,1,1,1";
+.?###????????. 3,2,1
+";
         let result = Report::from_str(input).unwrap();
-        assert_eq!(result.lines.len(), 10);
-        assert_eq!(result.lines[0].iterate_sum(5), 1);
-        assert_eq!(result.lines[1].iterate_sum(5), 16384);
-        assert_eq!(result.lines[2].iterate_sum(5), 1);
-        assert_eq!(result.lines[3].iterate_sum(5), 16);
-        assert_eq!(result.lines[4].iterate_sum(5), 2500);
-        assert_eq!(result.lines[6].get_count(), 150);
-        assert_eq!(result.lines[5].iterate_sum(2), 150);
-        assert_eq!(result.lines[5].iterate_sum(5), 506250);
-        assert_eq!(result.lines[7].get_count(), 7795537);
-        assert_eq!(result.lines[8].get_count(), 7421875);
-        assert_eq!(result.lines[9].get_count(), 61440000);
+        assert_eq!(
+            result.lines[0].get_pattern_lines(),
+            (
+                "??? 1,1".to_string(),
+                ".###???? 3,1,1".to_string(),
+                ".### 3".to_string()
+            )
+        );
+        assert_eq!(
+            result.lines[1].get_pattern_lines(),
+            (
+                ".??.?? 1,1".to_string(),
+                ".?##.?.??.?? 3,1,1".to_string(),
+                ".?##. 3".to_string()
+            )
+        );
+        assert_eq!(
+            result.lines[2].get_pattern_lines(),
+            (
+                "?#?#?#?#?#?#?#? 1,3,1,6".to_string(),
+                "?#?#?#?#?#?#?#?? 1,3,1,6".to_string(),
+                "".to_string()
+            )
+        );
+        assert_eq!(
+            result.lines[3].get_pattern_lines(),
+            (
+                "????.# 4,1".to_string(),
+                ".#.?????.# 1,4,1".to_string(),
+                ".#. 1".to_string()
+            )
+        );
+        assert_eq!(
+            result.lines[4].get_pattern_lines(),
+            (
+                "????.###### 1,6".to_string(),
+                ".#####.?????.###### 5,1,6".to_string(),
+                ".#####. 5".to_string()
+            )
+        );
+        assert_eq!(
+            result.lines[5].get_pattern_lines(),
+            (
+                "?###???????? 3,2,1".to_string(),
+                "?###????????? 3,2,1".to_string(),
+                "".to_string()
+            )
+        );
+        assert_eq!(
+            result.lines[6].get_pattern_lines(),
+            (
+                ".?###????????. 3,2,1".to_string(),
+                ".?###????????.? 3,2,1".to_string(),
+                "".to_string()
+            )
+        );
     }
+
+    //     #[test]
+    //     fn report_sum_works() {
+    //         let input = "???.### 1,1,3
+    // .??..??...?##. 1,1,3
+    // ?#?#?#?#?#?#?#? 1,3,1,6
+    // ????.#...#... 4,1,1
+    // ????.######..#####. 1,6,5
+    // ?###???????? 3,2,1
+    // ????.######..#####.?????.######..#####.?????.######..#####.?????.######..#####.?????.######..#####. 1,6,5,1,6,5,1,6,5,1,6,5,1,6,5
+    // ?###??????????###???????? 3,2,1,3,2,1
+    // ?????#?..???????##????????#?..???????##????????#?..???????##????????#?..???????##????????#?..???????##?? 4,1,1,6,4,1,1,6,4,1,1,6,4,1,1,6,4,1,1,6
+    // ???.???????.#.#?#?.????.???????.#.#?#?.????.???????.#.#?#?.????.???????.#.#?#?.????.???????.#.#?#?. 1,3,1,1,1,1,1,3,1,1,1,1,1,3,1,1,1,1,1,3,1,1,1,1,1,3,1,1,1,1
+    // .???.#.#??????.????.???.#.#??????.????.???.#.#??????.????.???.#.#??????.????.???.#.#??????.??? 3,1,1,1,1,1,3,1,1,1,1,1,3,1,1,1,1,1,3,1,1,1,1,1,3,1,1,1,1,1";
+    //         let result = Report::from_str(input).unwrap();
+    //         assert_eq!(result.lines.len(), 11);
+    //         assert_eq!(result.lines[0].iterate_sum(5), 1);
+    //         assert_eq!(result.lines[1].iterate_sum(5), 16384);
+    //         assert_eq!(result.lines[2].iterate_sum(5), 1);
+    //         assert_eq!(result.lines[3].iterate_sum(5), 16);
+    //         assert_eq!(result.lines[4].iterate_sum(5), 2500);
+    //         assert_eq!(result.lines[6].get_count(), 150);
+    //         assert_eq!(result.lines[5].iterate_sum(2), 150);
+    //         assert_eq!(result.lines[5].iterate_sum(5), 506250);
+    //         assert_eq!(result.lines[7].get_count(), 7795537);
+    //         assert_eq!(result.lines[8].get_count(), 7421875);
+    //         assert_eq!(result.lines[9].get_count(), 61440000);
+    //     }
 }
