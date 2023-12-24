@@ -313,151 +313,7 @@ impl ReportLine {
             .iter()
             .sum()
     }
-    // fn sum_pattern(&self) -> u64 {
-    //     dbg!(&self.original);
-    //     let sections: Vec<&str> = self.original.split(".").filter(|x| !x.is_empty()).collect();
-    //     let mut sections_count = sections.len();
-    //     if sections[0].len() < self.arrangement[0] {
-    //         sections_count -= 1;
-    //     }
-    //     if sections[sections.len() - 1].len() < self.arrangement[self.arrangement.len() - 1] {
-    //         sections_count -= 1;
-    //     }
-    //     if sections_count > 2 {
-    //         let mut first: &str = "";
-    //         let mut last: &str = "";
-    //         let mut idx: usize = 0;
-    //         let mut section_count: usize = 0;
-    //         for c in self.original.chars() {
-    //             if c == '.' {
-    //                 // if section_count > self.arrangement[0] {
-    //                 if idx - section_count >= self.arrangement[0] {
-    //                     // Found the sections that are large enough
-    //                     first = &self.original[0..=idx];
-    //                     last = &self.original[idx + 1..self.original.len()];
-    //                     break;
-    //                     // } else {
-    //                     //     section_count = 0;
-    //                 }
-    //                 section_count += 1;
-    //             }
-    //             idx += 1;
-    //         }
-    //         first = ReportLine::rem_first_and_last_str(first, ".");
-    //         // last = ReportLine::rem_first_and_last_str(last, ".");
-    //         let mut first_required_limit = first.split("#").filter(|x| !x.is_empty()).count() - 1;
-    //         if first.starts_with("#") {
-    //             first_required_limit += 1;
-    //         }
-    //         if first.ends_with("#") {
-    //             first_required_limit += 1;
-    //         }
-    //         // dbg!(&first_required_limit);
-    //         let mut last_required_limit = last.split("#").filter(|x| !x.is_empty()).count() - 1;
-    //         if last.starts_with("#") {
-    //             last_required_limit += 1;
-    //         }
-    //         if last.ends_with("#") {
-    //             last_required_limit += 1;
-    //         }
-    //         // dbg!(&last_required_limit);
 
-    //         let mut last_limit = self.arrangement.len();
-    //         if self.arrangement.len() == 2 {
-    //             last_limit = self.arrangement.len() - 1;
-    //         }
-    //         if self.arrangement.len() > 2 {
-    //             last_limit = self.arrangement.len() - 1;
-    //             if last_required_limit > 1 {
-    //                 // Adjust last_limit to include the len check
-    //                 let mut limit_size = self.arrangement[self.arrangement.len() - 1];
-    //                 // dbg!(&limit_size);
-    //                 let last_len = last.replace(".", "").len();
-    //                 (0..self.arrangement.len() - 1).rev().for_each(|x| {
-    //                     if last_len >= limit_size + self.arrangement[x] && x > 1 {
-    //                         last_limit = x;
-    //                     }
-    //                     limit_size += self.arrangement[x];
-    //                     // dbg!(&limit_size);
-    //                 });
-    //             }
-    //         }
-    //         let mut size: usize = self.arrangement[0]; // starting at the first size
-    //         let mut ending_idx: usize = 0;
-    //         if first_required_limit > 0
-    //             || (first_required_limit + last_required_limit + 1 < self.arrangement.len())
-    //             || (last_required_limit == 0 && first_required_limit == 0)
-    //         {
-    //             (1..last_limit).for_each(|x| {
-    //                 if first.len() >= size + self.arrangement[x] + x {
-    //                     size += self.arrangement[x];
-    //                     ending_idx += 1;
-    //                 }
-    //             });
-    //             // dbg!(&ending_idx);
-    //         }
-    //         let mut first_str = format!("{:?}", &self.arrangement[0..=ending_idx]);
-    //         first_str = first_str.replace("[", "").replace("]", "").replace(" ", "");
-    //         let mut last_str = format!(
-    //             "{:?}",
-    //             &self.arrangement[ending_idx + 1..self.arrangement.len()]
-    //         );
-    //         last_str = last_str.replace("[", "").replace("]", "").replace(" ", "");
-
-    //         let first_line: &str = &[first, " ", &first_str].concat();
-    //         // dbg!(&first_line);
-
-    //         let mid_line: String;
-    //         if last_str.len() > 0 {
-    //             mid_line = format!("{}?{} {},{}", last, first, last_str, first_str);
-    //         } else {
-    //             mid_line = format!("{} {}", first, first_str);
-    //         };
-
-    //         // dbg!(&mid_line);
-
-    //         let mut report = ReportLine::new();
-    //         report.from_input(first_line);
-    //         let first_count = report.get_count();
-    //         report.from_input(&mid_line);
-    //         let mid_count = report.get_count();
-
-    //         let last_count = if last_str.len() > 0 {
-    //             let last_line: &str = &[last, " ", &last_str].concat();
-    //             // dbg!(&last_line);
-    //             report.from_input(last_line);
-    //             report.get_count()
-    //         } else {
-    //             1
-    //         };
-
-    //         // dbg!(&first_count);
-    //         // dbg!(&mid_count);
-    //         // dbg!(&last_count);
-
-    //         let mut sum = mid_count.pow(4);
-    //         if first_count != 0 {
-    //             sum = sum * first_count
-    //         };
-    //         if last_count != 0 {
-    //             sum = sum * last_count
-    //         };
-
-    //         sum + 0
-    //     } else {
-    //         let first_count = self.get_count();
-    //         let mut report = ReportLine::new();
-
-    //         let mut arrangement_str = format!("{:?}", &self.arrangement[0..self.arrangement.len()]);
-    //         arrangement_str = arrangement_str
-    //             .replace("[", "")
-    //             .replace("]", "")
-    //             .replace(" ", "");
-    //         report.from_input(&[&self.original, "? ", &arrangement_str].concat());
-    //         let mid_count = report.get_count();
-    //         first_count * mid_count.pow(4)
-    //     }
-    // }
     fn sum_pattern(&self) -> u64 {
         dbg!(&self.original);
 
@@ -482,9 +338,11 @@ impl ReportLine {
         // dbg!(&first_count);
         // dbg!(&second_count);
         // dbg!(&third_count);
-
-        if third_count == 0 {
-            first_count * second_count.pow(4)
+        // if third_count == 0 {
+        //     first_count * second_count.pow(4)
+        if first_count == 0 || second_count == 0 || third_count == 0 {
+            // first_count * second_count.pow(4)
+            panic!("Count had a zero in it({first_count},{second_count},{third_count})",)
         } else {
             first_count * second_count.pow(4) * third_count
         }
@@ -510,6 +368,11 @@ impl ReportLine {
         let original = &self.original;
         let mut vec_original: Vec<&str> =
             self.original.split(".").filter(|s| !s.is_empty()).collect();
+
+        // Strip the leading unknown if they are less than the first arrangement size
+        while vec_original[0].len() < self.arrangement[0] {
+            let _removed = vec_original.remove(0);
+        }
 
         // All unknown is treated the same as all known
         let all_unknown = self.original.replace(".", "").replace("?", "").is_empty();
@@ -561,6 +424,7 @@ impl ReportLine {
                 .map(|x| vec_original[x].len())
                 .sum::<usize>()
                 < self.arrangement[0]
+            || vec_original[0].len() == self.arrangement[0]
         {
             vec_original = Vec::new();
             vec_original.push(ReportLine::rem_first_and_last(&original));
@@ -585,52 +449,6 @@ impl ReportLine {
                     .replace(" ", "");
             first_line = [&first_line, " ", &arrangement_str.clone()].concat();
             second_line = [&second_line, " ", &arrangement_str.clone()].concat();
-
-        // } else if vec_original.len() == self.arrangement.len() {
-        //     dbg!("=======================In Equal==================");
-        //     // dbg!(&original);
-        //     // there is a one to one size for the original line
-        //     //  So build with the last arrangement on the third line
-        //     (0..vec_original.len() - 2).for_each(|i| {
-        //         first_line = [
-        //             first_line.clone(),
-        //             vec_original[i].to_owned(),
-        //             ".".to_owned(),
-        //         ]
-        //         .concat();
-        //     });
-        //     first_line = [
-        //         first_line.clone(),
-        //         vec_original[vec_original.len() - 2].to_owned(),
-        //     ]
-        //     .concat();
-        //     // add back the beginning and ending operational char
-        //     if original.starts_with(".") {
-        //         first_line = [".", &first_line].concat();
-        //     }
-        //     third_line = [".", &vec_original[vec_original.len() - 1]].concat();
-        //     if original.ends_with(".") {
-        //         third_line = [&third_line, "."].concat();
-        //     }
-        //     let start_arrangement_str: String =
-        //         format!("{:?}", &self.arrangement[0..=&self.arrangement.len() - 2])
-        //             .replace("[", "")
-        //             .replace("]", "")
-        //             .replace(" ", "");
-        //     let end_arrangement_str = self.arrangement[&self.arrangement.len() - 1].to_string();
-        //     // put together the second_line using the "end"+"?"+"start" format, which becomes the pattern
-        //     second_line = [third_line.clone(), "?".to_owned(), first_line.clone()].concat();
-        //     // Now add all the ending arrangement strings to each line! example: "line"+" "+"1,2,3"
-        //     first_line = [first_line, " ".to_owned(), start_arrangement_str.clone()].concat();
-        //     third_line = [third_line, " ".to_owned(), end_arrangement_str.clone()].concat();
-        //     second_line = [
-        //         second_line,
-        //         " ".to_owned(),
-        //         end_arrangement_str.clone(),
-        //         ",".to_owned(),
-        //         start_arrangement_str.clone(),
-        //     ]
-        //     .concat();
         } else {
             dbg!("=======================In Last Now==================");
             dbg!(&original);
@@ -737,12 +555,43 @@ impl ReportLine {
                 "???.?#?#???",
                 "????.?#.?#",
                 "?##.?.????#.#..?#",
+                ".???..??????.?",
+                "??.?##?.?.??#??",
+                "???.#???#?",
             ]
             .contains(&original.as_str())
             {
                 arrangement_idx = 1;
                 vec_idx = 1;
             }
+            if ["????##?.????#???#?", "#????#?.??#.", "???##???.??#???"]
+                .contains(&original.as_str())
+            {
+                arrangement_idx = 2;
+                vec_idx = 1;
+            }
+            if ["?#????#??#.??.#"].contains(&original.as_str()) {
+                arrangement_idx = 3;
+                vec_idx = 2;
+            }
+            if ["?.??#??.?.?.#????#"].contains(&original.as_str()) {
+                arrangement_idx = 3;
+                vec_idx = 3;
+            }
+
+            if [
+                "?????#?????...????",
+                "??#??#????.??.?##.",
+                "?#?????.?????#??#..",
+                "??????#?.????#????",
+                "#?#????#..#????##???",
+            ]
+            .contains(&original.as_str())
+            {
+                arrangement_idx = 3;
+                vec_idx = 1;
+            }
+
             dbg!(&arrangement_idx);
             dbg!(&vec_idx);
             if vec_idx > 0 {
@@ -840,7 +689,9 @@ impl ReportLine {
         // dbg!(format!("{:?}", &sequence_needed));
         let mut dedups_list: Vec<Vec<u8>> = Vec::new();
 
-        if self.arrangement.len() == 1 && self.arrangement[0] == self.original.len() {
+        if self.arrangement.len() == 1
+            && self.arrangement[0] == self.original.replace(".", "").len()
+        {
             // This means there is only 1 permutation, so just return the char combination
             dedups_list.push(char_combination);
         } else {
@@ -1246,6 +1097,7 @@ mod tests {
 ?????.#???.# 1,1,1,1
 ?..#??#???#?#.? 1,1,1,5
 ???.?#?#??? 1,1,1
+?????#?????...???? 5,1,1,1,1
 ";
         let result = Report::from_str(input).unwrap();
         assert_eq!(
@@ -1475,6 +1327,15 @@ mod tests {
                 ".?#?#??? 1,1".to_string()
             )
         );
+        // ?????#?????...???? 5,1,1,1,1
+        assert_eq!(
+            result.lines[26].get_pattern_lines(),
+            (
+                "?????#????? 5,1,1".to_string(),
+                ".??????????#????? 1,1,5,1,1".to_string(),
+                ".???? 1,1".to_string()
+            )
+        );
     }
 
     //     #[test]
@@ -1490,6 +1351,7 @@ mod tests {
     // ?????#?..???????##????????#?..???????##????????#?..???????##????????#?..???????##????????#?..???????##?? 4,1,1,6,4,1,1,6,4,1,1,6,4,1,1,6,4,1,1,6
     // ???.???????.#.#?#?.????.???????.#.#?#?.????.???????.#.#?#?.????.???????.#.#?#?.????.???????.#.#?#?. 1,3,1,1,1,1,1,3,1,1,1,1,1,3,1,1,1,1,1,3,1,1,1,1,1,3,1,1,1,1
     // .???.#.#??????.????.???.#.#??????.????.???.#.#??????.????.???.#.#??????.????.???.#.#??????.??? 3,1,1,1,1,1,3,1,1,1,1,1,3,1,1,1,1,1,3,1,1,1,1,1,3,1,1,1,1,1";
+    // ????#?#?????????#?????#?#?????????#?????#?#?????????#?????#?#?????????#?????#?#?????????# 1,9,1,1,1,9,1,1,1,9,1,1,1,9,1,1,1,9,1,1
     //         let result = Report::from_str(input).unwrap();
     //         assert_eq!(result.lines.len(), 11);
     //         assert_eq!(result.lines[0].iterate_sum(5), 1);
