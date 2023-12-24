@@ -24,4 +24,4 @@ Note: Although this version is running and very efficent, it's very messy and ju
 
 There is a mixture of solutions working although one of them has an issue at the moment and producing the incorrect answer.
 
-
+HINT to myself: Rewrite!!! Use the pattern method to get correct line combinations.
