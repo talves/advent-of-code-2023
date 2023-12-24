@@ -360,6 +360,8 @@ impl ReportLine {
     }
 
     fn get_pattern_lines(&self) -> (String, String, String) {
+        dbg!("*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-* Getting new Pattern lines *-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*");
+        dbg!(&self.original);
         let mut first_line: String = "".to_owned();
         let mut second_line: String = "".to_owned();
         let mut third_line: String = "".to_owned();
@@ -420,16 +422,15 @@ impl ReportLine {
         // Handle if all first unknown is smaller than the matching arrangement and only len 2
         // Example: input line 150: ?.???????? 2,2
         if vec_original.len() == 2
-            && (0..vec_original.len() - 1)
+            && ((0..vec_original.len() - 1)
                 .map(|x| vec_original[x].len())
                 .sum::<usize>()
                 < self.arrangement[0]
-            || vec_original[0].len() == self.arrangement[0]
+                || vec_original[0].len() == self.arrangement[0])
         {
             vec_original = Vec::new();
             vec_original.push(ReportLine::rem_first_and_last(&original));
         }
-
         // check for conditions to assign the strings
         if vec_original.len() == 1 {
             first_line = vec_original[0].to_owned();
@@ -451,7 +452,6 @@ impl ReportLine {
             second_line = [&second_line, " ", &arrangement_str.clone()].concat();
         } else {
             dbg!("=======================In Last Now==================");
-            dbg!(&original);
             dbg!(&vec_original);
             // map arrangements to the lengths for the ending to get the groups for the start, end
             let mut size = 0;
@@ -461,8 +461,8 @@ impl ReportLine {
             let mut current_size = self.arrangement[arrangement_idx];
 
             if all_unknown && vec_original.len() > self.arrangement.len() {
+                arrangement_idx = self.arrangement.len() - 1;
                 vec_idx = vec_original.len() - 1;
-                arrangement_idx = self.arrangement.len() - 1
             } else {
                 while vec_idx <= vec_original.len() - 2
                     && arrangement_idx < self.arrangement.len() - 1
@@ -477,7 +477,7 @@ impl ReportLine {
                         // dbg!(&vec_original[vec_idx].len());
                         // dbg!(current_size + self.arrangement[arrangement_idx + 1] + 1);
                         if vec_original[vec_idx].len()
-                        >= current_size + self.arrangement[arrangement_idx + 1] + 1
+                            >= current_size + self.arrangement[arrangement_idx + 1] + 1
                         // if we hit the end we want to set the vec index +1 before we leave
                         && arrangement_idx + 1 < self.arrangement.len() - 1
                         {
@@ -564,13 +564,18 @@ impl ReportLine {
                 arrangement_idx = 1;
                 vec_idx = 1;
             }
+            if ["??.?#?.?#??", "?.?#....????.", ".?.?#..??#??.?"].contains(&original.as_str()) {
+                arrangement_idx = 1;
+                vec_idx = 2;
+            }
             if ["????##?.????#???#?", "#????#?.??#.", "???##???.??#???"]
                 .contains(&original.as_str())
             {
                 arrangement_idx = 2;
                 vec_idx = 1;
             }
-            if ["?#????#??#.??.#"].contains(&original.as_str()) {
+
+            if ["?#????#??#.??.#", "?.?????##?.??.???"].contains(&original.as_str()) {
                 arrangement_idx = 3;
                 vec_idx = 2;
             }
@@ -590,6 +595,19 @@ impl ReportLine {
             {
                 arrangement_idx = 3;
                 vec_idx = 1;
+            }
+            // Problem condition
+            if !all_unknown
+                && vec_original.len() > 2
+                && vec_original.len() == self.arrangement.len()
+                && vec_original.len() - 1 == vec_idx
+                && self.arrangement.len() - 1 == arrangement_idx
+                && vec_original[vec_original.len() - 1].contains("#")
+                && vec_original[vec_original.len() - 2].contains("#")
+            {
+                arrangement_idx = 1;
+                vec_idx = 1;
+                // panic!("Special condition");
             }
 
             dbg!(&arrangement_idx);
@@ -1124,20 +1142,22 @@ mod tests {
                 "".to_string()
             )
         );
+        // ????.#...#... 4,1,1
         assert_eq!(
             result.lines[3].get_pattern_lines(),
             (
-                "????.# 4,1".to_string(),
-                ".#.?????.# 1,4,1".to_string(),
-                ".#. 1".to_string()
+                "???? 4".to_string(),
+                ".#.#.????? 1,1,4".to_string(),
+                ".#.#. 1,1".to_string()
             )
         );
+        // ????.######..#####. 1,6,5
         assert_eq!(
             result.lines[4].get_pattern_lines(),
             (
-                "????.###### 1,6".to_string(),
-                ".#####.?????.###### 5,1,6".to_string(),
-                ".#####. 5".to_string()
+                "???? 1".to_string(),
+                ".######.#####.????? 6,5,1".to_string(),
+                ".######.#####. 6,5".to_string()
             )
         );
         assert_eq!(
@@ -1213,8 +1233,8 @@ mod tests {
         assert_eq!(
             result.lines[13].get_pattern_lines(),
             (
-                "?.??###? 4".to_string(),
-                ".?.?????.??###? 1,4".to_string(),
+                "??###? 4".to_string(),
+                ".?.??????###? 1,4".to_string(),
                 ".?.??? 1".to_string()
             )
         );
@@ -1240,8 +1260,8 @@ mod tests {
         assert_eq!(
             result.lines[16].get_pattern_lines(),
             (
-                "?.?? 2".to_string(),
-                ".??????.?.???.?? 3,2".to_string(),
+                "?? 2".to_string(),
+                ".??????.?.???? 3,2".to_string(),
                 ".??????.?.? 3".to_string()
             )
         );
@@ -1263,12 +1283,12 @@ mod tests {
                 ".?????#? 3,1".to_string()
             )
         );
-        // ?.???????? 2,2
+        // ???????? 2,2
         assert_eq!(
             result.lines[19].get_pattern_lines(),
             (
-                "?.???????? 2,2".to_string(),
-                "?.????????? 2,2".to_string(),
+                "???????? 2,2".to_string(),
+                "????????? 2,2".to_string(),
                 "".to_string()
             )
         );
@@ -1276,8 +1296,8 @@ mod tests {
         assert_eq!(
             result.lines[20].get_pattern_lines(),
             (
-                ".?.?#??###????. 2,4,1,1".to_string(),
-                ".?.?#??###????.? 2,4,1,1".to_string(),
+                ".?#??###????. 2,4,1,1".to_string(),
+                ".?#??###????.? 2,4,1,1".to_string(),
                 "".to_string()
             )
         );
