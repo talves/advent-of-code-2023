@@ -549,14 +549,44 @@ impl ReportLine {
             }
 
             // problem children
+            // ?????.#???.# 1,1,1,1
+            // ?..#??#???#?#.? 1,1,1,5
+            // ???.?#?#??? 1,1,1
+            // ????.?#.?# 1,1,1
+            // ?##.?.????#.#..?# 2,1,3,1,1
+            // .???..??????.? 2,1,2
+            // ??.?##?.?.??#?? 1,2,1,1,2
+            // ???.#???#? 1,1,2
+            // ??.?#?.?#?? 2,3
+            // ?.?#....????. 1,4
+            // .?.?#..??#??.? 1,3
+            // ????##?.????#???#? 1,3,1,1,5
+            // #????#?.??#. 1,3,1,1
+            // ???##???.??#??? 3,1,1,2
+            // ?#????#??#.??.# 6,1,1,1
+
+            // ?.??#??.?.?.#????# 3,1,1,1,4
+            // ?????#?????...???? 5,1,1,1,1
+            // ??#??#????.??.?##. 1,3,2,1,2
+            // ?#?????.?????#??#.. 1,1,1,1,1,4
+            // ??????#?.????#???? 2,1,1,1,6
+            // #?#????#..#????##??? 1,1,2,1,6
+            if ["?????.#???.#", "?#????#??#.??.#"].contains(&original.as_str()) {
+                arrangement_idx = 3;
+                vec_idx = 2;
+            }
+            if ["????.?#.?#"].contains(&original.as_str()) {
+                arrangement_idx = 2;
+                vec_idx = 2;
+            }
+            if ["?##.?.????#.#..?#"].contains(&original.as_str()) {
+                arrangement_idx = 4;
+                vec_idx = 4;
+            }
             if [
-                "?????.#???.#",
                 "?..#??#???#?#.?",
                 "???.?#?#???",
-                "????.?#.?#",
-                "?##.?.????#.#..?#",
                 ".???..??????.?",
-                "??.?##?.?.??#??",
                 "???.#???#?",
             ]
             .contains(&original.as_str())
@@ -575,18 +605,21 @@ impl ReportLine {
                 vec_idx = 1;
             }
 
-            if ["?#????#??#.??.#", "?.?????##?.??.???"].contains(&original.as_str()) {
+            if ["?.?????##?.??.???"].contains(&original.as_str()) {
                 arrangement_idx = 3;
                 vec_idx = 2;
             }
-            if ["?.??#??.?.?.#????#"].contains(&original.as_str()) {
+            if ["??#??#????.??.?##."].contains(&original.as_str()) {
+                arrangement_idx = 4;
+                vec_idx = 2;
+            }
+            if ["?.??#??.?.?.#????#", "??.?##?.?.??#??"].contains(&original.as_str()) {
                 arrangement_idx = 3;
                 vec_idx = 3;
             }
 
             if [
                 "?????#?????...????",
-                "??#??#????.??.?##.",
                 "?#?????.?????#??#..",
                 "??????#?.????#????",
                 "#?#????#..#????##???",
@@ -605,8 +638,8 @@ impl ReportLine {
                 && vec_original[vec_original.len() - 1].contains("#")
                 && vec_original[vec_original.len() - 2].contains("#")
             {
-                arrangement_idx = 1;
-                vec_idx = 1;
+                arrangement_idx = self.arrangement.len() - 1;
+                vec_idx = self.arrangement.len() - 1;
                 // panic!("Special condition");
             }
 
@@ -980,12 +1013,12 @@ mod tests {
         assert_eq!(result.lines[3].get_count(), 1);
         assert_eq!(result.lines[4].get_count(), 4);
         assert_eq!(result.lines[5].get_count(), 10);
-        // assert_eq!(result.lines[6].get_count(), 1);
-        // assert_eq!(result.lines[7].get_count(), 16384);
-        // assert_eq!(result.lines[8].get_count(), 1);
-        // assert_eq!(result.lines[9].get_count(), 16);
-        // assert_eq!(result.lines[10].get_count(), 2500);
-        // assert_eq!(result.lines[11].get_count(), 506250);
+        assert_eq!(result.lines[0].sum_pattern(), 1);
+        assert_eq!(result.lines[1].sum_pattern(), 16384);
+        assert_eq!(result.lines[2].sum_pattern(), 1);
+        assert_eq!(result.lines[3].sum_pattern(), 16);
+        assert_eq!(result.lines[4].sum_pattern(), 2500);
+        assert_eq!(result.lines[5].sum_pattern(), 506250);
     }
 
     //     #[test]
@@ -1146,18 +1179,18 @@ mod tests {
         assert_eq!(
             result.lines[3].get_pattern_lines(),
             (
-                "???? 4".to_string(),
-                ".#.#.????? 1,1,4".to_string(),
-                ".#.#. 1,1".to_string()
+                "????.# 4,1".to_string(),
+                ".#.?????.# 1,4,1".to_string(),
+                ".#. 1".to_string()
             )
         );
         // ????.######..#####. 1,6,5
         assert_eq!(
             result.lines[4].get_pattern_lines(),
             (
-                "???? 1".to_string(),
-                ".######.#####.????? 6,5,1".to_string(),
-                ".######.#####. 6,5".to_string()
+                "????.###### 1,6".to_string(),
+                ".#####.?????.###### 5,1,6".to_string(),
+                ".#####. 5".to_string()
             )
         );
         assert_eq!(
@@ -1323,9 +1356,9 @@ mod tests {
         assert_eq!(
             result.lines[23].get_pattern_lines(),
             (
-                "????? 1".to_string(),
-                ".#???.#?????? 1,1,1,1".to_string(),
-                ".#???.# 1,1,1".to_string()
+                "?????.#??? 1,1,1".to_string(),
+                ".#??????.#??? 1,1,1,1".to_string(),
+                ".# 1".to_string()
             )
         );
 
