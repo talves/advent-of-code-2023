@@ -378,6 +378,12 @@ impl ReportLine {
 
         // All unknown is treated the same as all known
         let all_unknown = self.original.replace(".", "").replace("?", "").is_empty();
+        // All damaged and equal; The sections count match the length of the arrangement count.
+        let all_damaged_equal = vec_original.len() == self.arrangement.len()
+            && (0..vec_original.len())
+                .filter(|x| vec_original[*x].replace("?", "").len() > 0)
+                .count()
+                == self.arrangement.len();
         // Handle if the last section is unknown and smaller than the last assignment len
         if vec_original.len() - 1 == self.arrangement.len()
             && vec_original[vec_original.len() - 1]
@@ -433,14 +439,15 @@ impl ReportLine {
         }
         // check for conditions to assign the strings
         if vec_original.len() == 1 {
-            first_line = vec_original[0].to_owned();
-            // add back the beginning and ending operational char
-            if original.starts_with(".") {
-                first_line = [".", &first_line].concat();
-            }
-            if original.ends_with(".") {
-                first_line = [&first_line, "."].concat();
-            }
+            first_line = original.clone();
+            // first_line = vec_original[0].to_owned();
+            // // add back the beginning and ending operational char
+            // if original.starts_with(".") {
+            //     first_line = [".", &first_line].concat();
+            // }
+            // if original.ends_with(".") {
+            //     first_line = [&first_line, "."].concat();
+            // }
             second_line = [&first_line, "?"].concat();
             // third_line will stay empty
             let arrangement_str: String =
@@ -630,17 +637,22 @@ impl ReportLine {
                 vec_idx = 1;
             }
             // Problem condition
-            if !all_unknown
-                && vec_original.len() > 2
-                && vec_original.len() == self.arrangement.len()
-                && vec_original.len() - 1 == vec_idx
-                && self.arrangement.len() - 1 == arrangement_idx
-                && vec_original[vec_original.len() - 1].contains("#")
-                && vec_original[vec_original.len() - 2].contains("#")
-            {
+            // if !all_unknown
+            //     && vec_original.len() > 2
+            //     && vec_original.len() == self.arrangement.len()
+            //     && vec_original.len() - 1 == vec_idx
+            //     && self.arrangement.len() - 1 == arrangement_idx
+            //     && vec_original[vec_original.len() - 1].contains("#")
+            //     && vec_original[vec_original.len() - 2].contains("#")
+            // {
+            //     arrangement_idx = self.arrangement.len() - 1;
+            //     vec_idx = self.arrangement.len() - 1;
+            //     // panic!("Special condition");
+            // }
+            if all_damaged_equal {
                 arrangement_idx = self.arrangement.len() - 1;
                 vec_idx = self.arrangement.len() - 1;
-                // panic!("Special condition");
+                // panic!("Special condition; Have damaged and equal size");
             }
 
             dbg!(&arrangement_idx);
@@ -1320,8 +1332,8 @@ mod tests {
         assert_eq!(
             result.lines[19].get_pattern_lines(),
             (
-                "???????? 2,2".to_string(),
-                "????????? 2,2".to_string(),
+                "?.???????? 2,2".to_string(),
+                "?.????????? 2,2".to_string(),
                 "".to_string()
             )
         );
@@ -1329,8 +1341,8 @@ mod tests {
         assert_eq!(
             result.lines[20].get_pattern_lines(),
             (
-                ".?#??###????. 2,4,1,1".to_string(),
-                ".?#??###????.? 2,4,1,1".to_string(),
+                "..?.?#??###????. 2,4,1,1".to_string(),
+                "..?.?#??###????.? 2,4,1,1".to_string(),
                 "".to_string()
             )
         );
