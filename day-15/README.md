@@ -1,6 +1,6 @@
 # Day 15:
 
-<!-- ![Completed](completed.png) -->
+![Completed](completed.png)
 
 ## Part 1
 
