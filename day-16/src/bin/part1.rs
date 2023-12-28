@@ -4,11 +4,12 @@ fn main() {
     dbg!(output);
 }
 
-fn process(input: &str) -> String {
-    format!("Hello, {}", input)
+fn process(input: &str) -> u64 {
+    format!("Hello, {}", input);
+    todo!()
 }
 
-fn part1(input: &str) -> String {
+fn part1(input: &str) -> u64 {
     process(input)
 }
 
@@ -18,7 +19,18 @@ mod tests {
 
     #[test]
     fn part1_works() {
-        let result = part1("Advent of Code!");
-        assert_eq!(result, "Hello, Advent of Code!");
+        let result = part1(
+            r".|...\....
+|.-.\.....
+.....|-...
+........|.
+..........
+.........\
+..../.\\..
+.-.-/..|..
+.|....-|.\
+..//.|....",
+        );
+        assert_eq!(result, 46);
     }
 }
