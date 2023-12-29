@@ -1,6 +1,6 @@
 # Day 16:
 
-<!-- ![Completed](completed.png) -->
+![Completed](completed.png)
 
 ## Part 1
 
@@ -9,7 +9,7 @@ cargo test
 cargo run --bin part1
 ```
 
-[instructions](https://adventofcode.com/2023/day/00)
+[instructions](https://adventofcode.com/2023/day/16)
 
 
 ## Part 2
@@ -18,4 +18,6 @@ cargo run --bin part1
 cargo test
 cargo run --bin part2
 ```
+
+[instructions](https://adventofcode.com/2023/day/16#part2)
 
