@@ -142,7 +142,7 @@ fn process(input: &str) -> u64 {
     let mut unprocessed: Vec<(Location, Direction)> = vec![start_light_beam.unwrap()];
 
     while unprocessed.len() > 0 {
-        dbg!(&unprocessed.len());
+        // dbg!(&unprocessed.len());
         let current_location: Location = unprocessed[0].0;
         let current_direction: Direction = unprocessed[0].1;
         match start_light_beam {
@@ -168,13 +168,13 @@ fn process(input: &str) -> u64 {
                 panic!("Bad mirror stored: {}", current_location)
             }
         };
-        println!(
-            "location: {} direction: {:?} mirror: {:?} length: {}",
-            &current_location,
-            &current_direction,
-            &mirror,
-            unprocessed.len()
-        );
+        // println!(
+        //     "location: {} direction: {:?} mirror: {:?} length: {}",
+        //     &current_location,
+        //     &current_direction,
+        //     &mirror,
+        //     unprocessed.len()
+        // );
         let result = process_light_beam(&mirror, &current_location, &current_direction, &bounds);
         match result {
             (None, None) => {
